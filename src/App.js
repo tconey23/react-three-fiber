@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
@@ -6,6 +6,8 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { TextureLoader } from 'three';
 import ThreeFlower from './ThreeFlower';
 import TorusStem from './TorusStem';
+import ProcLeaf from './ProcLeaf';
+import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 import stemObjPath from './textures/Flower.vox.obj';
 import stemMtlPath from './textures/Flower.vox.mtl';
@@ -18,6 +20,17 @@ import potOcc from './textures/Wall_Plaster_001_ambientOcclusion.jpg';
 import potRough from './textures/Wall_Plaster_001_roughness.jpg';
 import windowBackground from './textures/window-background.jpg';
 import { useRef } from 'react';
+import scene1 from './assets/flower.gltf'
+
+function GLTFModel() {
+  const gltf = useLoader(GLTFLoader, scene1);
+
+  return (
+    <group>
+      <primitive object={gltf.scene} scale={0.1} position={[0,5,0.5]}/>
+    </group>
+  );
+}
 
 function FlowerModel({ position }) {
   const materials = useLoader(MTLLoader, stemMtlPath);
@@ -58,7 +71,7 @@ function App() {
 
   return (
     <>
-    <div style={{ height: '1080px', width: '98vw', background: 'aliceblue' }}>
+    {/* <div style={{ height: '1080px', width: '98vw', background: 'aliceblue' }}>
       <Canvas>
         <ambientLight intensity={1} />
         <directionalLight position={[10, 10, 10]} intensity={1} />
@@ -125,47 +138,19 @@ function App() {
 
         <OrbitControls />
       </Canvas>
-    </div>
+    </div> */}
 
-
-
-    <div style={{ height: '1080px', width: '98vw', background: 'aliceblue' }}>
+    <div style={{ height: '968px', width: '98vw', background: 'aliceblue' }}>
       <Canvas>
         <ambientLight intensity={1} />
         <directionalLight position={[10, 10, 10]} intensity={1} />
         <spotLight position={[10, 10, 10]} angle={0.25} penumbra={1} />
         <pointLight position={[10, 10, 10]} />
-          <ThreeFlower />
-        <OrbitControls />
-      </Canvas>
-    </div>
-
-    <div style={{ height: '1080px', width: '98vw', background: 'aliceblue' }}>
-      <Canvas ref={canvasRef}>
-        <ambientLight intensity={1} />
-        <directionalLight position={[10, 10, 10]} intensity={1} />
-        <spotLight position={[10, 10, 10]} angle={0.25} penumbra={1} />
-        <pointLight position={[10, 10, 10]} />
-          
-          
-        <mesh position={[0,0,15]}>
-            <TorusStem />
-          </mesh>
-          <mesh position={[0,0,12]}>
-            <TorusStem />
-          </mesh>
-          <mesh position={[0,0,9]}>
-            <TorusStem />
-          </mesh>
-          <mesh position={[0,0,6]}>
-            <TorusStem />
-          </mesh>
-          <mesh position={[0,0,3]}>
-            <TorusStem />
-          </mesh>
-          <mesh position={[0,0,0]}>
-            <TorusStem />
-          </mesh>
+        <ProcLeaf />
+{/* <ThreeFlower />
+<Suspense fallback={null}>
+<GLTFModel url={scene1} />
+</Suspense> */}
         <OrbitControls />
       </Canvas>
     </div>

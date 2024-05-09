@@ -9,9 +9,16 @@ const Torus = () => {
     return(
         <>
             <mesh>
-                <torusGeometry args={[5, 3, 32, 256]} />
+                <torusGeometry args={[10, 3, 32, 256]} />
                 <meshPhongMaterial attach="material" color={"green"} />
             </mesh>
+            {/* <mesh>
+                <torusGeometry args={[10, 6, 32, 256]} />
+                <shaderMaterial
+                    attach="material"
+                    transparent={true}
+                />
+            </mesh> */}
         </>
     )
 }
