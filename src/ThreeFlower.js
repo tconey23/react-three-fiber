@@ -44,9 +44,9 @@ function ThreeFlower({ rotationX = 55, rotationY = 0, rotationZ = 0, scale = [0.
         <mesh>
           <Leaf position={[0, 2.5, 0]} rotationY={45} rotationZ={25} rotationX={180} />
         </mesh>
-        <mesh   position={[0,5,0]}>
+        {/* <mesh   position={[0,5,0]}>
             <BloomModel />
-        </mesh>
+        </mesh> */}
         
     </>
   );
