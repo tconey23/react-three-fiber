@@ -6,7 +6,7 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { TextureLoader } from 'three';
 import ThreeFlower from './ThreeFlower';
 import TorusStem from './TorusStem';
-import ProcLeaf from './ProcLeaf';
+import ProcLeaf2 from './ProcLeaf2';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 import stemObjPath from './textures/Flower.vox.obj';
@@ -19,8 +19,9 @@ import potNorm from './textures/Wall_Plaster_001_normal.jpg';
 import potOcc from './textures/Wall_Plaster_001_ambientOcclusion.jpg';
 import potRough from './textures/Wall_Plaster_001_roughness.jpg';
 import windowBackground from './textures/window-background.jpg';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import scene1 from './assets/flower.gltf'
+import Sliders from './Sliders'
 
 function GLTFModel() {
   const gltf = useLoader(GLTFLoader, scene1);
@@ -51,6 +52,7 @@ function BloomModel({ position }) {
 }
 
 function App() {
+  // const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9})
   const canvasRef = useRef()
   const [colorMap, displacementMap, normalMap, roughnessMap, aoMap] = useLoader(TextureLoader, [
     potCol,
@@ -69,8 +71,15 @@ function App() {
   const bloomModelPosition = [center[0] + offsetX, center[1] + offsetY, center[2] + offsetZ];
   const flowerModelPosition = [center[0], center[1], center[2]];  
 
+  // function updateLeafDimensions(formData) {
+  //   setLeafDimensions(formData)
+  // }
+
+
   return (
     <>
+      {/* <Sliders updateLeafDimensions={updateLeafDimensions} /> */}
+
     {/* <div style={{ height: '1080px', width: '98vw', background: 'aliceblue' }}>
       <Canvas>
         <ambientLight intensity={1} />
@@ -139,20 +148,22 @@ function App() {
         <OrbitControls />
       </Canvas>
     </div> */}
-
     <div style={{ height: '968px', width: '98vw', background: 'aliceblue' }}>
       <Canvas>
         <ambientLight intensity={1} />
         <directionalLight position={[10, 10, 10]} intensity={1} />
         <spotLight position={[10, 10, 10]} angle={0.25} penumbra={1} />
         <pointLight position={[10, 10, 10]} />
-        <ProcLeaf />
-{/* <ThreeFlower />
-<Suspense fallback={null}>
-<GLTFModel url={scene1} />
-</Suspense> */}
         <OrbitControls />
+        <ProcLeaf2 />
+        {/* <ProcLeaf leafDimensions={leafDimensions}/> */}
       </Canvas>
+      {/* <ThreeFlower />
+      <Suspense fallback={null}>
+      <GLTFModel url={scene1} />
+      </Suspense> */}
+        {/* <OrbitControls />
+      // </Canvas> */}
     </div>
     
     </>
