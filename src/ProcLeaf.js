@@ -1,57 +1,31 @@
-import React, { useRef } from 'react';
-import { Canvas, useLoader, useFrame } from '@react-three/fiber';
+import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
-function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 0.25, 0.25], ...props }) {
-  const leafRef = useRef();
+function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 0.25, 0.25], heartShape, onLeafProps, extrudeSettings }) {
+  const heartRef = useRef();
 
-  useFrame(() => {
-    // leafRef.current.rotation.y += 0.01;
-  });
+  useEffect(() => {
+    const heartGeometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+    if (heartRef.current) {
+      heartRef.current.geometry.dispose(); // Clean up old geometry
+      heartRef.current.geometry = heartGeometry; // Set new geometry
+    }
 
-  const randomNumber = (max, min) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min
-  }
+    return () => {
+      heartGeometry.dispose(); // Properly dispose of the geometry when component unmounts or dependencies change
+    };
+  }, [heartShape, extrudeSettings]);
 
-
-  const cpX = randomNumber(-10, 10)
-  const cpY = randomNumber(-10, 10)
-  const rX = randomNumber(-10, 10)
-  const rY = randomNumber(-10, 10)
-
-  const leafShape = new THREE.Shape();
-  leafShape.moveTo(0, 0);
-  console.log(cpX, cpY, rX, rY)
-  // leafShape.quadraticCurveTo(cpX, cpY, rX, rY);
-  // leafShape.quadraticCurveTo(cpX, -cpY, rX, -rY);
-  // leafShape.quadraticCurveTo(2,2,10,8)
-  leafShape.quadraticCurveTo(1,1,9,7)
-
-  const leafShapes = [
-    leafShape.quadraticCurveTo(1,1,9,7),
-    leafShape.quadraticCurveTo(9,2,9,2),
-    leafShape.quadraticCurveTo(1,2,4,8),
-    leafShape.quadraticCurveTo(8,2,9,1)
-  ]
-  // Define leaf geometry
-  const leafGeometry = new THREE.ExtrudeGeometry(leafShape, {
-    steps: 10,
-    depth: 0.10,
-    bevelEnabled: false,
-  });
-
-  const center = [0, 0, 0];
-  const offsetX = 1.4;
-  const offsetY = 0;
-  const offsetZ = -1.5;
+  useEffect(() => {
+    if (typeof onLeafProps === 'function') {
+      onLeafProps({ rotationX, rotationY, rotationZ, scale, heartShape, extrudeSettings });
+    }
+  }, [onLeafProps, rotationX, rotationY, rotationZ, scale, heartShape, extrudeSettings]);
 
   return (
-    <>
-      <mesh {...props} rotation={[rotationX, rotationY, rotationZ]} scale={scale}>
-        <bufferGeometry attach="geometry" {...leafGeometry} />
-        <meshPhongMaterial color="green" />
-      </mesh>
-    </>
+    <mesh ref={heartRef} rotation={[rotationX, rotationY, rotationZ]} scale={scale}>
+      <meshPhongMaterial color="green" />
+    </mesh>
   );
 }
 
