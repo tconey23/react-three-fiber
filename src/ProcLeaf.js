@@ -1,11 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
-function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 0.25, 0.25], heartShape, onLeafProps, extrudeSettings }) {
+function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.04, 0.04, 0.04], heartShape, onLeafProps, extrudeSettings }) {
   const heartRef = useRef();
 
   useEffect(() => {
-    const heartGeometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+    const heartGeometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings, onLeafProps);
     if (heartRef.current) {
       heartRef.current.geometry.dispose(); // Clean up old geometry
       heartRef.current.geometry = heartGeometry; // Set new geometry
