@@ -2,67 +2,75 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
-import { Noise } from 'noisejs'; 
+import Perlin from 'perlin';
+import Noise from 'noisejs';
 
-function NoisyShape({
-    radiusTop,
-    radiusBottom,
-    shape_Length,
-    shape_Width,
-    shape_Height,
-    radialSegments,
-    noiseScale,
-    noiseImpactX,
-    noiseImpactY,
-    noiseImpactZ,
-    seed,
-    shapeType 
-  }) {
-    const meshRef = useRef();
-    const noise = new Noise(seed);
-  
-    useEffect(() => {
-      let geometry;
-      switch(shapeType) {
-        case 'cube':
-          geometry = new THREE.BoxGeometry(shape_Length, shape_Width, shape_Height);
-          break;
-        case 'sphere':
-          geometry = new THREE.SphereGeometry(radiusTop, radialSegments, radialSegments);
-          break;
-        case 'cylinder':
-        default:
-          geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, shape_Height, radialSegments);
-      }
-  
-      const positions = geometry.attributes.position.array;
-      for (let i = 0; i < positions.length; i += 3) {
-        const x = positions[i];
-        const y = positions[i + 1];
-        const z = positions[i + 2];
-        positions[i] += noise.perlin3(x * noiseScale, y * noiseScale, z * noiseScale) * noiseImpactX;
-        positions[i + 1] += noise.perlin3(x * noiseScale, y * noiseScale, z * noiseScale) * noiseImpactY;
-        positions[i + 2] += noise.perlin3(x * noiseScale, y * noiseScale, z * noiseScale) * noiseImpactZ;
-      }
-  
-      geometry.attributes.position.needsUpdate = true;
-      geometry.computeVertexNormals();
-  
-      if (meshRef.current) {
-        meshRef.current.geometry.dispose();
-        meshRef.current.geometry = geometry;
-      }
-    }, [radiusTop, radiusBottom, shape_Height, radialSegments, noiseScale, noiseImpactX, noiseImpactY, noiseImpactZ, seed, shapeType]);
-  
-    return (
-      <mesh ref={meshRef}>
-        <meshStandardMaterial attach="material" color="green" />
-      </mesh>
-    );
-  }
+function NoisyShape2({
+  radiusTop,
+  radiusBottom,
+  shape_Length,
+  shape_Width,
+  shape_Height,
+  radialSegments,
+  noiseScale,
+  noiseImpactX,
+  noiseImpactY,
+  noiseImpactZ,
+  seed,
+  shapeType
+}) {
+  const meshRef = useRef();
+  const perlin = new Perlin(seed); // Create a Perlin noise instance
+  console.log(perlin.noise)
+
+  useEffect(() => {
+    let geometry;
+
+    switch (shapeType) {
+      case 'cube':
+        geometry = new THREE.BoxGeometry(shape_Length, shape_Width, shape_Height);
+        break;
+      case 'sphere':
+        geometry = new THREE.SphereGeometry(radiusTop, radialSegments, radialSegments);
+        break;
+      case 'cylinder':
+      default:
+        geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, shape_Height, radialSegments);
+    }
+
+    const positions = geometry.attributes.position.array;
+
+    for (let i = 0; i < positions.length; i += 3) {
+      const x = positions[i];
+      const y = positions[i + 1];
+      const z = positions[i + 2];
+
+      // Generate Perlin noise for each vertex
+      const noiseValue = perlin.noise(x * noiseScale, y * noiseScale, z * noiseScale);
+
+      positions[i] += noiseValue * noiseImpactX;
+      positions[i + 1] += noiseValue * noiseImpactY;
+      positions[i + 2] += noiseValue * noiseImpactZ;
+    }
+
+    geometry.attributes.position.needsUpdate = true;
+    geometry.computeVertexNormals();
+
+    if (meshRef.current) {
+      meshRef.current.geometry.dispose();
+      meshRef.current.geometry = geometry;
+    }
+  }, [radiusTop, radiusBottom, shape_Length, shape_Width, shape_Height, radialSegments, noiseScale, noiseImpactX, noiseImpactY, noiseImpactZ, seed, shapeType]);
+
+  return (
+    <mesh ref={meshRef}>
+      <meshStandardMaterial attach="material" color="green" />
+    </mesh>
+  );
+}
 
 function TwoDNoise() {
-  const [shapeType, setShapeType] = useState("cylinder")
+  const [shapeType, setShapeType] = useState("cylinder");
   const [settings, setSettings] = useState({
     radiusTop: 1,
     radiusBottom: 1,
@@ -70,10 +78,10 @@ function TwoDNoise() {
     shape_Width: 5,
     shape_Height: 5,
     radialSegments: 100,
-    noiseScale: 0,
-    noiseImpactX: 0,
-    noiseImpactY: 0,
-    noiseImpactZ: 0,
+    noiseScale: 0.1, // Adjusted noise scale for better visualization
+    noiseImpactX: 0.1, // Adjusted noise impact for better visualization
+    noiseImpactY: 0.1, // Adjusted noise impact for better visualization
+    noiseImpactZ: 0.1, // Adjusted noise impact for better visualization
     seed: 12345
   });
 
@@ -92,44 +100,45 @@ function TwoDNoise() {
   }, []);
 
   useEffect(() => {
-    console.log(shapeType)
     switch(shapeType){
-        case 'cylinder': setSettings({
-            radiusTop: 1,
-            radiusBottom: 1,
-            shape_Height: 5,
-            radialSegments: 100,
-            noiseScale: 0,
-            noiseImpactX: 0,
-            noiseImpactY: 0,
-            noiseImpactZ: 0,
-            seed: 12345
-          })
+      case 'cylinder':
+        setSettings({
+          radiusTop: 1,
+          radiusBottom: 1,
+          shape_Height: 5,
+          radialSegments: 100,
+          noiseScale: 0.1,
+          noiseImpactX: 0.1,
+          noiseImpactY: 0.1,
+          noiseImpactZ: 0.1,
+          seed: 12345
+        });
         break;
-        case 'cube': setSettings({
-            shape_Length: 5,
-            shape_Width: 5,
-            shape_Height: 5,
-            noiseScale: 0,
-            noiseImpactX: 0,
-            noiseImpactY: 0,
-            noiseImpactZ: 0,
-            seed: 12345
-          })
+      case 'cube':
+        setSettings({
+          shape_Length: 5,
+          shape_Width: 5,
+          shape_Height: 5,
+          noiseScale: 0.1,
+          noiseImpactX: 0.1,
+          noiseImpactY: 0.1,
+          noiseImpactZ: 0.1,
+          seed: 12345
+        });
         break;
-        case 'sphere': setSettings({
-            radiusTop: 1,
-            radialSegments: 100,
-            noiseScale: 0,
-            noiseImpactX: 0,
-            noiseImpactY: 0,
-            noiseImpactZ: 0,
-            seed: 12345
-          })
+      case 'sphere':
+        setSettings({
+          radiusTop: 1,
+          radialSegments: 100,
+          noiseScale: 0.1,
+          noiseImpactX: 0.1,
+          noiseImpactY: 0.1,
+          noiseImpactZ: 0.1,
+          seed: 12345
+        });
         break;
-
     }
-  }, [shapeType])
+  }, [shapeType]);
 
   const saveSettings = () => {
     const savedShapes = localStorage.getItem('shapeSettings');
@@ -165,10 +174,10 @@ function TwoDNoise() {
       <Canvas>
         <ambientLight intensity={1} />
         <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
-        <NoisyShape
-            key={settings.seed + shapeType} 
-                {...settings}
-            shapeType={shapeType}
+        <NoisyShape2
+          key={settings.seed + shapeType} 
+          {...settings}
+          shapeType={shapeType}
         />
         <OrbitControls />
       </Canvas>
@@ -176,4 +185,4 @@ function TwoDNoise() {
   );
 }
 
-export default ThreeDNoise;
+export default TwoDNoise;

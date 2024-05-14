@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>[T&F] flowers - rose</title>
+<style>
+      body {
+         background: rgba(8, 15, 32, 1.0);
+         color: #ccc;
+         font-size: 13px;
+      }
+   </style>
+</head>
+<body>
+<canvas id="main_canvas" width="800" height="700"></canvas>
+<script type="module">
+import * as THREE from 'https://alikim.com/_v1_jsm/three.module.js'
+import GMRNG from 'https://alikim.com/_v1_jsm/rng.js'
+import { hsvRgb } from 'https://alikim.com/_v1_jsm/glsl_ported.js'
+import { norm, norm2, dot, cross, sphereToCart, quaternRotate, quaternRotateMult, quaternAdd, quaternFromVects, quaternFromETh, twistGeom, profileGeom, noiseGeom } from 'https://alikim.com/_v1_jsm/geometry.js'
+import { multVec16CM } from 'https://alikim.com/_v1_jsm/matrices.js'
+import { safeToStr, deepCopy } from 'https://alikim.com/_v1_jsm/utils.js'
+import { computeProfileNormals, computeTwistNormals } from 'https://alikim.com/_v1_jsm/utils_three.js'
+import { LeafGeom, PetalGeom, LatheGeom } from 'https://alikim.com/_lush/tree/js/lpf.js'
+import { Tween } from 'https://alikim.com/_v1_jsm/tween.js'
+import { GLTFLoader } from 'https://alikim.com/_v1_jsm/GLTFLoader.js'
+
+const get = id => document.getElementById(id);
+// GLOBAL
+const reg_numarr = /([+-]?[0-9.]+).*?/g;
+const deg_to_rad = Math.PI / 180;
+const half_PI = Math.PI / 2;
+const int = ['num', 'tot', 'seg'];
+const getUI = (pr, v) => int.includes(pr) ? parseInt(v) : parseFloat(v);
+const texldr = new THREE.TextureLoader();
+const tween = new Tween();
+const gltfldr = new GLTFLoader();
+// DATA
+const GET = {};
+let max_lev = 4;
+const data = {grp:'flowers',name:'rose',max_lev:4,html:{trunk_w:{value:0.001},trunk_h:{value:5},trunk_min:{value:0.1},trunk_num:{value:35},trunk_xbias:{value:1},trunk_zbias:{value:1},trunk_seg:{value:'3,0'},trunk_grv:{value:1},trunk_rgb:{value:''},br_0w:{value:0.005},br_1w:{value:0.01},br_2w:{value:0.01},br_3w:{value:0.01},br_0h:{value:0.5},br_1h:{value:0.6},br_2h:{value:0.2},br_3h:{value:0.15},br_0min:{value:0.05},br_1min:{value:2},br_2min:{value:1},br_3min:{value:1},br_0num:{value:30},br_1num:{value:1},br_2num:{value:2},br_3num:{value:2},br_0fi:{value:'0,360,0,360'},br_1fi:{value:'-40,40,140,220'},br_2fi:{value:'45,45,45,45'},br_3fi:{value:'45,45,45,45'},br_0ybias:{value:'70,90'},br_1ybias:{value:'30,50'},br_2ybias:{value:'40,40'},br_3ybias:{value:'40,40'},br_0tot:{value:4},br_1tot:{value:7},br_2tot:{value:1},br_3tot:{value:1},br_0seg:{value:'3,0'},br_1seg:{value:'0,1'},br_2seg:{value:'1,0'},br_3seg:{value:'1,0'},br_0grv:{value:0},br_1grv:{value:0},br_2grv:{value:0},br_3grv:{value:0},br_0rgb:{value:''},br_1rgb:{value:''},br_2rgb:{value:''},br_3rgb:{value:''},trunk_rend_path:{checked:false},trunk_rend_solid:{checked:true},trunk_rel_fi:{checked:true},trunk_follow:{checked:false},trunk_tip:{checked:false},trunk_code:{value:'mesh = {_NL_  mat: new THREE.MeshLambertMaterial(),_NL_  geo: new THREE.CylinderGeometry(0.07, 0.075, 1, 16, 1),_NL_};_NL__NL_const base = [0x67, 0x48, 0x26].map(e=>e/255);_NL_const len = color.length;_NL_for(let i = 0; i < len; i++) _NL_	color[i] = new THREE.Color(base[0], base[1] + 0.2 * i / len, base[2]);_NL__NL_'},trunk_anim:{value:''},br_0rend_path:{checked:false},br_0rend_solid:{checked:true},br_0rel_fi:{checked:true},br_0follow:{checked:true},br_0tip:{checked:false},br_0code:{value:'mesh = {_NL_  mat: new THREE.MeshLambertMaterial(),_NL_  geo: new THREE.CylinderGeometry(0.017, 0.02, 1, 16, 2),_NL_};_NL__NL_const base = [0x67, 0x48, 0x26].map(e=>e/255);_NL_const len = color.length;_NL_for(let i = 0; i < len; i++) _NL_	color[i] = new THREE.Color(base[0], base[1] + 0.2 * i / len, base[2]);_NL__NL_'},br_0anim:{value:''},br_1rend_path:{checked:false},br_1rend_solid:{checked:true},br_1rel_fi:{checked:true},br_1follow:{checked:true},br_1tip:{checked:false},br_1code:{value:'const leaf = LeafGeom({_NL_  name:_SQ_rose_SQ_,_NL_  bisecDist: 0.001,_NL_  makeZ: (x,y) => -0.002*x*x - 0.002*y*y,_NL_});_NL_const geo = leaf.geo;_NL_geo.scale(0.003, 0.003, 0.003);_NL_geo.translate(0, -0.5, 0);_NL__NL_mesh = {_NL_  uniscale: true,_NL_  geo,_NL_  mat: new THREE.MeshLambertMaterial({side: THREE.DoubleSide}),_NL_};_NL__NL_for(let i = 0; i < color.length; i++) _NL_	color[i] = new THREE.Color(0.2, 0.2 + 0.2 * i / color.length, 0.1);_NL_'},br_1anim:{value:''},br_2rend_path:{checked:false},br_2rend_solid:{checked:true},br_2rel_fi:{checked:false},br_2follow:{checked:false},br_2tip:{checked:true},br_2code:{value:'mesh = {_NL_  uniscale: true,_NL_  mat: new THREE.MeshLambertMaterial({color:0x674826}),_NL_  geo: new THREE.SphereGeometry(1, 12, 4),_NL_};_NL_mesh.geo.translate(0, -0.53, 0);_NL__NL_for(let i = 0; i < color.length; i++) _NL_	color[i] = new THREE.Color(0.1,0.4,0.1);_NL__NL_const leaf = LeafGeom({_NL_  name:_SQ_palm_SQ_,_NL_  bisecDist: 0.1, _NL_  makeZ: (x,y) => 0.002*y*y,_NL_});_NL__NL_petals = {_NL_  mat: new THREE.MeshLambertMaterial({side:THREE.DoubleSide}),_NL_  geo: leaf.geo,_NL_  center: false,_NL_  offset: [12,12,50],_NL_  ybias: [-20,-25],_NL_  usenormals: true,_NL_};_NL_petals.geo.scale(0.01, 0.003, 0.01);_NL__NL_const base = [0x47, 0x58, 0x26].map(e=>e/255);_NL_const clr = petals.color = new Array(20);_NL_const plen = clr.length;_NL_for(let i = 0; i < plen; i++)_NL_  clr[i] = new THREE.Color(base[0], base[1] + 0.3 * i / plen, base[2]);'},br_2anim:{value:''},br_3rend_path:{checked:false},br_3rend_solid:{checked:true},br_3rel_fi:{checked:false},br_3follow:{checked:false},br_3tip:{checked:true},br_3code:{value:'mesh = {_NL_  mat: new THREE.MeshLambertMaterial({color:0x301010}),_NL_  geo: new THREE.IcosahedronGeometry(.5, 1),_NL_};_NL_mesh.geo.scale(0.4, 3, 0.4);_NL__NL_for(let i = 0; i < color.length; i++) _NL_	color[i] = new THREE.Color(0.9,0.8,0);_NL__NL_const leaf = PetalGeom({_NL_  name:_SQ_rose_SQ_,_NL_  bisecDist: 0.001, _NL_  makeZ: (x,y) => 20*Math.sin(0.033*y) + 0.5*y - x*x*0.01_NL_});_NL__NL_petals = {_NL_  shineThrough: 0.7,_NL_  mat: new THREE.MeshLambertMaterial({side: THREE.DoubleSide, color: leaf.rgb}),_NL_  geo: leaf.geo,_NL_  center: false,_NL_  offset: [0,24],_NL_  ybias: [-60,-100],_NL_  usenormals: true,_NL_};_NL_petals.geo.scale(0.006, 0.007, 0.006);_NL__NL_petals.mat.map = texldr.load(_NL_  _SQ_/_lush/tree/textures/petal_SQ_+_SQ_s/rose.png_SQ_,_NL_  maybeRender,_NL_  undefined,_NL_  err => { console.log(_SQ_texture load err:_SQ_, err)}_NL_);'},br_3anim:{value:''}},seeds:{rgb:{z:1001350302,w:512530079},poly_trunk_:{z:741719037,w:868638885},br_0_gen:{z:1198853658,w:487064864},br_0_upd:{z:678080422,w:603682630},br_1_upd:{z:173380362,w:85650131},br_2_upd:{z:1768850852,w:680357316},br_1_gen:{z:2416247029,w:999296968},br_2_gen:{z:1824293715,w:686738977},br_3_upd:{z:860108084,w:990251594},br_3_gen:{z:1483434025,w:447033799},br_3_sld:{z:503530904,w:47427110},trunk__sld:{z:336301384,w:655824451},br_0_sld:{z:769797503,w:67365143},br_1_sld:{z:1768850852,w:680357316},br_2_sld:{z:1264810418,w:505810381}}};
+const html = data.html;
+const pref = ['trunk_'];
+for(let i = 0; i < max_lev; i++) pref[i + 1] = 'br_' + i;
+const elog = arg => { if(arg) console.log(arg) };
+const elogErr = arg => { console.log(arg) };
+let GLTF = {};
+const loadGLTF = (str, res) => {
+	GLTF = {};
+	let toLoad = {};
+	try {
+		elog('');
+		toLoad = eval(`(${str})`);
+	} catch(e) { 
+		elogErr(`loadGLTF(${str}):\n${e}`);
+		return;
+	};
+	let tot = 0;
+	for(const p in toLoad) {
+		tot++;
+		gltfldr.load(
+			toLoad[p], 
+			gltf => { 
+				GLTF[p] = gltf; 
+				if(--tot == 0) res?.();
+				elog(`${tot} loaded GLTF.${p}\n`, true);
+			},
+			undefined,
+			err => {
+				if(--tot == 0) res?.(); 
+				log('error loading gltf:', err); 
+			}
+		);
+	}
+}
+const load = async (def, imp_data) => {
+   
+	
+
+	
+
+	const rngGet = rngSeed;
+
+	let autoplay, gltf;
+	const [grp, nm] = [
+		GET.group ? decodeURI(GET.group) : selText(html.imp_grp), 
+		GET.name ? decodeURI(GET.name) : selText(html.imp_name)
+	];
+	if(!def && grp && nm) { 
+		if(tree) tree.dispose(sett.scene);
+		const pobj = imp_data || parr[presets[grp][nm]];
+		GET.group = GET.name = '';
+		// re-populate ui
+		for(const p in pobj.html) {
+			const v = pobj.html[p];
+			const val = v.value;
+			if(val != undefined) {
+				const pfx = p.slice(-4);
+				html[p].value = pfx == 'code' || pfx == 'anim' ? safeToStr(val) : val;
+				
+			}
+			else if(v.hasOwnProperty('checked')) html[p].checked = v.checked;
+		}
+		if(html.exp_grp) html.exp_grp.value = grp;
+		if(html.exp_name) html.exp_name.value = nm;
+		// one time use rng
+		if(pobj.seeds) {
+			seeds = deepCopy(pobj.seeds);
+			rngSeed = rngSet;
+		}
+		// color settings
+		['bg', 'gr', 'ao', 'co'].forEach(nm => {
+			const p = pobj?.sett?.[nm] || sett[nm + '_'];
+			if(nm == 'bg') sett.scene.background.setRGB(...p);
+			else if(nm == 'gr') sett.grnd.material.color.setRGB(...p);
+			sett[nm] = p;
+		});
+		
+	
+		max_lev = pobj.max_lev;
+
+		autoplay = pobj.auto;
+		gltf = pobj.gltf;
+	}
+
+
+	if(gltf) {
+		const str = safeToStr(gltf);
+		
+		await new Promise((res, rej) => { loadGLTF(str, res) }).then(()=>{}).catch(()=>{});
+	}
+	
+
+	tree = new TREE();
+	for(const prf of pref) tree.updateAnim(prf); // create .code
+	sett.scene.add(tree.main);
+	
+	rngSeed = rngGet;
+	
+	if(autoplay) html?.allplay?.click(); else maybeRender();
+}
+// RNG
+const rng = new GMRNG();
+const rngInit = () => {
+	const seed = Math.round(1000 * Math.random());
+	for (let i = 0; i < seed; i++) rng.f01();
+}
+rngInit();
+const rand = () => rng.f01()
+let seeds = {};
+let rngSeed = nm => {};
+const rngSet = nm => { const obj = seeds[nm]; if(obj) rng.set(obj) }
+// TREE
+const updateColors = rgb => {
+	rngSeed('rgb');
+	const off = 1 / (max_lev + 1);
+	const hue = rand();
+	for(let i = 0; i <= max_lev; i++) {
+		const clr = html[pref[i] + 'rgb'].value;
+		rgb[i] = clr ? clr.match(reg_numarr).map(v => parseFloat(v)) : 
+		hsvRgb([hue + off * i, 1, 1]);
+	}
+}
+const makeGeo = vert => {
+	const geo = new THREE.BufferGeometry();
+	const vertices = new Float32Array(vert);
+	return geo.setAttribute('position', new THREE.BufferAttribute( vertices, 3 ));
+}
+const disposeMesh = (nm, par) => {
+	const m = par.getObjectByName(nm);
+	if(m) {
+		par.remove(m);
+		m.geometry.dispose();
+		m.material.dispose();
+	}
+}
+const makeMesh = (nm, vert, mat, rgb) => {
+	const geo = makeGeo(vert);
+	const trans = {};
+	if(rgb.length == 4) {
+		trans.transparent = true;
+		trans.opacity = rgb.pop();
+	}
+	if(mat == 'line') {
+		const mat = new THREE.LineBasicMaterial({ color: new THREE.Color(...rgb), linewidth: 1, ...trans});
+		const mesh = new THREE.Line(geo, mat);
+		mesh.name = nm;
+		mesh.frustumCulled = false;
+		return mesh;
+	}
+}
+const genPoly = pr => { 
+	const [w, h, num] = ['w', 'h', 'num'].map(nm => getUI(nm, html[pr + nm].value));
+	const vert = [0, 0, 0];
+
+	const y = [];
+	for(let i = 0; i < num; i++) y[i] = h * rand();
+	y.sort((a,b) => a < b ? -1 : a > b ? 1 : 0);
+
+	const w2 = w * 2;
+	const min_dist = html[pr + 'min'].value;
+	const md2 = min_dist * min_dist;
+	for(let i = 0; i < num; i++) {
+		const x = w2 * (rand() - 0.5);
+		const z = w2 * (rand() - 0.5);
+		const off = vert.length - 3;
+		const [dx, dy, dz] = [x - vert[off], y[i] - vert[off + 1], z - vert[off + 2]];
+		if(dx * dx + dy * dy + dz * dz < md2) continue;
+		vert.push(x, y[i], z);
+	}
+	if(vert.length == 3) vert.push(0, h, 0); // at least 2 points
+	return vert;
+}
+const calcFinalPos = (v, q, ox, oy, oz) => {
+	const len = v.length;
+	const arr = quaternRotateMult(v, ...q);
+	const _v = new Array(len);
+	for(let i = 0; i < len; i+=3) 
+		[_v[i], _v[i + 1], _v[i + 2]] = [arr[i] + ox, arr[i + 1] + oy, arr[i + 2] + oz];
+	return _v;
+}
+const followXZProj = (proj, add = 0) => { // follow zx rotation
+	const xz_fi = (Math.atan2(proj[0], proj[1]) + add) / 2;
+	return [Math.cos(xz_fi), 0, Math.sin(xz_fi), 0];
+}
+const twist = (geo, axis, totang) => {
+	const pos = geo.attributes.position;
+	twistGeom(pos.array, axis, totang);
+	pos.needsUpdate = true;
+	computeTwistNormals(geo);
+}
+const profile = (geo, axis, func) => {
+	const pos = geo.attributes.position;
+	profileGeom(pos.array, axis, func);
+	pos.needsUpdate = true;
+	computeProfileNormals(geo, func);
+}
+const seamCond = geo => {
+	const [t, p] = [geo.type, geo.parameters];
+	if(t == 'TorusGeometry')
+		return (data, i) => Math.abs(data[i + 2]) / p.tube;
+	if(t == 'SphereGeometry')
+		return (data, i) => Math.abs(data[i + 2]) / p.radius;
+	if(t == 'CylinderGeometry') {
+		const rad = (p.radiusTop + p.radiusBottom) / 2;
+		return (data, i) => Math.abs(data[i + 2]) / rad;
+	}
+	if(t == 'LatheGeometry')
+		return (data, i) => Math.abs(data[i]);
+	return (data, i) => 1;
+}
+const noisePos = (geo, amp) => {
+	const pos = geo.attributes.position;
+	noiseGeom(pos.array, amp, seamCond(geo));
+	pos.needsUpdate = true;
+}
+const noiseNor = (geo, amp) => {
+	const nrm = geo.attributes.normal;
+	noiseGeom(nrm.array, amp, seamCond(geo));
+	nrm.needsUpdate = true;
+}
+const applyGravity = (_vj, grv) => {
+	for(let i = 0; i < _vj.length - 3; i+=3) {
+		const n = i + 3;
+		const p0 = [_vj[i], _vj[i + 1], _vj[i + 2]];
+		const p1 = [_vj[n], _vj[n + 1], _vj[n + 2]];
+		const e = norm(cross(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2], 0, -1, 0));
+		const thi = grv / 2;
+		const [sin, cos] = [Math.sin(thi), Math.cos(thi)];
+		const q = [cos, sin * e[0], sin* e[1], sin * e[2]];
+		// rotate all subseq points
+		const mod = [];
+		for(let ii = n; ii < _vj.length; ii+=3) {
+			for(let k = 0; k < 3; k++) _vj[ii + k] -= p0[k];
+		}
+		const arr = quaternRotateMult(_vj.slice(n), ...q);
+		for(let ii = n; ii < _vj.length; ii+=3) {
+			const ind = ii - n;
+			for(let k = 0; k < 3; k++) _vj[ii + k] = arr[ind + k] + p0[k];
+		}
+	}
+}
+const code = {};
+pref.forEach(nm => {
+Object.defineProperty(code, nm, {
+configurable: true,
+enumerable: true,
+get: function () {
+const str = safeToStr(html[nm + 'code'].value);
+const cfg = 'const cfg = {uniscale: false, attenuation: 0.66};\n';
+return eval(`(color => {${cfg}${str}\nreturn [height, mat, geo, cfg];})`);
+}
+})
+});
+function TREE() {
+	this.rgb = [];
+	this.trunk = {};
+	this.branches = [];
+	this.code = {};
+	this.animate = {};
+	['path', 'solid', 'main'].forEach(n => { 
+		this[n] = new THREE.Object3D(); 
+		this[n].name = n;
+	});
+	this.main.add(this.path).add(this.solid);
+	updateColors(this.rgb);
+	this.updateTrunk();
+}
+TREE.prototype.updateTrunk = function () {
+	rngSeed('poly_' + pref[0]);
+	this.trunk.vert = genPoly(pref[0]);
+	// quaternion from trunk bias
+	const h = html.trunk_h.value;
+	const xb = html.trunk_xbias.value;
+	const zb = html.trunk_zbias.value;
+	const bias = norm([xb, h, zb]);
+	const q = this.trunk.q = quaternFromVects([0, 1, 0], bias);
+
+	// to attach nex gen branches
+	this.trunk._v = calcFinalPos(this.trunk.vert, this.trunk.q, 0, 0, 0);
+
+	// gravity
+	const grv = deg_to_rad * getUI('grv', html.trunk_grv.value);
+	if(grv) applyGravity(this.trunk._v, grv);
+
+	if(html.trunk_rend_path.checked) {
+	disposeMesh('trunk', this.path);
+	const rgb = html.trunk_rgb.value.match(reg_numarr)?.map(v => parseFloat(v));
+	if(rgb) this.rgb[0] = rgb;
+	const mesh = this.trunk.mesh = makeMesh('trunk', this.trunk._v, 'line', this.rgb[0]);
+	mesh.visible = html.trunk_rend_path.checked;
+	this.path.add(mesh);
+	}
+
+	if(html.trunk_rend_solid.checked) {
+	this.solidify(pref[0], this.trunk, this.trunk.solid ? false : true);
+	}
+
+	if(max_lev) this.updateBranches(0, [q], [this.trunk._v], this.branches[0] ? false : true);
+}
+TREE.prototype.updateBranches = function (lev, _brq, _brv, gen = true) { 
+
+	const prf = pref[lev + 1];
+
+	const tip = html[prf + 'tip'].checked;
+	
+	// parents
+	const brq = tip ? [this.trunk.q] : _brq[0].length ? _brq : [_brq];
+	const brv = tip ? [this.trunk._v.slice(-6)] : _brv[0].length ? _brv : [_brv];
+
+	// att points offsets
+	const segm = [];
+	const [sf, sl] = tip ? [1,0] : html[pref[lev] + 'seg'].value.match(reg_numarr).map(v => parseInt(v));
+	const [ssf, ssl] = [1/sf > 0, 1/sl > 0];
+
+	// flatten branches arrays
+	let [cnt, scnt] = [0, 0];
+	const qoff = [0];
+	const _v = [];
+	for(let j = 0; j < brv.length; j++) {
+		const vj = brv[j];
+		const len = vj.length;
+		const qj = qoff[j];
+		const qj1 = qoff[j + 1] = qj + len / 3;
+
+		if(ssf && ssl)
+			for(let i = qj + sf; i < qj1 - sl; i++) segm[scnt++] = i;
+		else { 
+			for(let i = qj; i <= qj - sf; i++) segm[scnt++] = i;
+			for(let i = qj1 + sl; i < qj1; i++) segm[scnt++] = i;
+		}   
+		for(let i = 0; i < len; i++) _v[cnt++] = vj[i]; 
+	}
+
+	const findQ = ind => {
+		const len = brq.length;
+		const lm1 = len - 1;
+		if(ind >= qoff[lm1]) return [brq[lm1], lm1];
+		for(let i = 1; i < len; i++)
+		if(qoff[i] > ind)	return [brq[i - 1], i - 1];
+		return [brq[0], 0];
+	};
+
+	const branch = this.branches[lev] = this.branches[lev] || {};
+	const tot = gen ? parseInt(html[prf + 'tot'].value) : branch.q.length;
+	branch.q = new Array(tot);
+	branch._v = new Array(tot);
+
+	if(gen) {
+		branch.vert = new Array(tot);
+		branch.bsq = new Array(tot);
+
+		rngSeed(`${prf}_gen`);
+		const astr = html[prf + 'fi'].value.match(reg_numarr);
+		const afi = astr.map(v => deg_to_rad * getUI('fi', v));
+		const ybstr = html[prf + 'ybias'].value.match(reg_numarr);
+		const [ybmn, ybmx] = ybstr.map(v => deg_to_rad * getUI('ybias', v));
+		const ydif = ybmx - ybmn;
+		for(let j = 0; j < tot; j++) {
+			const [fimn, fimx] = rand() < 0.5 ? [afi[0], afi[1]] : [afi[2], afi[3]];
+			const fdif = fimx - fimn;
+			const fib = fdif ? fdif * rand() + fimn : fimn;
+			const thb = ydif ? ydif * rand() + ybmn : ybmn;
+			const [z, x, y] = sphereToCart(1, fib, thb); // spread bias
+			branch.bsq[j] = quaternFromVects([0, 1, 0], [x, y, z]);
+			branch.vert[j] = genPoly(prf); 
+		}
+	}
+
+	const mesh = branch.mesh;
+	if(mesh) for(let i = 0; i < mesh.length; i++) disposeMesh(mesh[i]?.name, this.path);
+	branch.mesh = new Array(tot);
+
+	rngSeed(`${prf}_upd`); 
+	const seglen = segm.length;
+	for(let j = 0; j < tot; j++) {
+		const pnt = segm[Math.floor(seglen * rand())]; // rand parent branch xyz triplet
+		const ind = pnt * 3;
+		const [parq, parn] = findQ(pnt);
+		const [ox, oy, oz] = [_v[ind], _v[ind + 1], _v[ind + 2]]; // triplet pos
+		
+		let q1 = branch.bsq[j];
+
+		if(html[prf + 'rel_fi'].checked) {
+			// follow branch zx rotation
+			const v = brv[parn];
+			const vlen = v.length;
+			const par_proj = [v[vlen - 3] - v[0], v[vlen - 1] - v[2]];
+			const qrel = followXZProj(par_proj, -half_PI);
+			q1 = quaternAdd(...qrel, ...q1);
+		}
+
+		const q = quaternAdd(...parq, ...q1);
+
+		// self quat
+		const _vj = branch._v[j] = calcFinalPos(branch.vert[j], q, ox, oy, oz);
+		const len = _vj.length;
+		const bias = norm([_vj[len - 3] - _vj[0], _vj[len - 2] - _vj[1], _vj[len - 1] - _vj[2]]); 
+		branch.q[j] = quaternFromVects([0, 1, 0], bias);
+
+		// gravity
+		const grv = deg_to_rad * getUI('grv', html[prf + 'grv'].value);
+		if(grv) applyGravity(_vj, grv);
+
+		if(html[prf + 'rend_path'].checked) {
+		const rgb = html[`${prf}rgb`].value.match(reg_numarr)?.map(v => parseFloat(v));
+		if(rgb) this.rgb[lev + 1] = rgb;
+		branch.mesh[j] = makeMesh(`${prf}_${j}`, _vj, 'line', this.rgb[lev + 1]);
+		this.path.add(branch.mesh[j]);
+		branch.mesh[j].visible = html[`${prf}rend_path`].checked;
+		}
+	}
+
+	if(html[prf + 'rend_solid'].checked) {
+	this.solidify(prf, branch, branch.solid ? false : true);
+	}
+
+	if(lev < max_lev - 1) {
+		const nxt = lev + 1;
+		this.updateBranches(nxt, branch.q, branch._v, this.branches[nxt] ? false : true);
+	}
+}
+TREE.prototype.solidify = function (prf, par, gen = true) {
+	
+	rngSeed(`${prf}_sld`); 
+
+	const getGeoData = (geo, center = false, off = [0,0], usenorm = false, err = 0.001) => {
+		const rnd = off[2] ? 0.01 * off[2] : 0;
+		const [idx, vert, norm] = [[], [], []];
+		const pos = geo.attributes.position.array;
+		const nrm = geo.attributes.normal.array;
+		let ind = 0;
+		for(let i = 0; i < pos.length; i+=3) {
+			const [px, py, pz] = [pos[i], pos[i + 1], pos[i + 2]];
+			if(Math.abs(px) < err && Math.abs(pz) < err && !center) continue;
+			let found = false;
+			for(let j = 0; j < vert.length; j+=3) {
+				if(Math.abs(vert[j] - px) < err && Math.abs(vert[j + 1] - py) < err && Math.abs(vert[j + 2] - pz) < err) { 
+					found = true;
+					break;
+				}
+			}
+			if(found) continue;
+			vert.push(px, py, pz);
+			if(usenorm) norm.push(nrm[i], nrm[i + 1], nrm[i + 2]);
+			idx[ind++] = i / 3;
+		}
+		const [s0, s1] = [off[0], off[1] ? -off[1] : Infinity];
+		const [s03, s13] = [s0 * 3, s1 * 3];
+		let [_idx, _vert, _norm] = [idx.slice(s0, s1), vert.slice(s03, s13), norm.slice(s03, s13)];
+		if(rnd) 
+		for(let i = 0; i < _idx.length; i++) { 
+			if(rand() > rnd) {
+				const k = i * 3;
+				_vert.splice(k, 3);
+				_norm.splice(k, 3);
+				_idx.splice(i--, 1);
+			}
+		}
+		return [_idx, _vert, _norm];
+	};
+
+   const translucency_146 = (mat, val = 0.5) => {
+
+      mat.onBeforeCompile = function(shader) {
+      const regex = /float dotNL *= *saturate\( *dot\( *geometry.normal, *directLight.direction *\) *\)/;
+      const repl = `
+      float _dotNL = dot(geometry.normal, directLight.direction);
+      if(_dotNL < 0.0) _dotNL = -${val} * _dotNL;
+      float dotNL = saturate(_dotNL);
+      `;
+      const new_fs = THREE.ShaderChunk.lights_lambert_pars_fragment.replace(regex, repl);
+      shader.fragmentShader =
+      shader.fragmentShader.replace('#include <lights_lambert_pars_fragment>', new_fs);
+      //console.log(new_fs);
+      }
+   };
+
+	const disposeIMesh = im => {
+		this.solid.remove(im);
+		im.geometry.dispose();
+		im.material.dispose();
+		im.dispose();
+	};
+
+	const newIMesh = (gen, im, geo, mat, size) => {
+		if(!gen && im.userData.count >= size) {
+			im.count = size;
+			return im;
+		}		
+		if(im) disposeIMesh(im);
+		const imesh = new THREE.InstancedMesh(geo, mat, size);
+		imesh.userData.count = size;
+		return imesh;
+	};
+
+	const flg = par._v[0].length; // branch
+	const _bv = [];
+	const endp = [par._v.length - 3]; // for attenuation
+	if(flg) {
+		// flatten arrays
+		let cnt = 0;
+		for(let j = 0; j < par._v.length; j++) {
+			const vj = par._v[j];
+			const len = vj.length;
+			endp[j] = j ? endp[j - 1] + len : len - 3;
+			for(let i = 0; i < len; i++) _bv[cnt++] = vj[i]; 
+		}
+	}
+
+	const _v = flg ? _bv : par._v;
+	const ts = par.solid = par.solid || {};
+
+	const num = _v.length / 3;
+	const imsz = num - (html[prf + 'tot']?.value || 1); // don't connect between branches
+
+	if(gen) { 
+		ts.color = new Array(imsz);
+
+		this.updateCode(prf);
+		try {
+			const cfg = this.code[prf](ts.color);
+			ts.geo?.dispose();
+			ts.mat?.dispose(); 
+			ts.petals?.geo?.dispose();
+			ts.petals?.mat?.dispose();
+			['height', 'shineThrough', 'petals'].forEach(nm => { delete ts[nm] });
+			for(const pr in cfg.mesh) ts[pr] = cfg.mesh[pr];
+			ts.petals = cfg.petals;
+			ts.height = ts.height || ts.geo?.parameters?.height || 2 * ts.geo?.parameters?.radius || 1;
+			ts.geo.translate(0, ts.height / 2, 0);
+			if(ts.hasOwnProperty('shineThrough')) translucency_146(ts.mat, ts.shineThrough);
+
+		} catch(e) { 
+			elogErr(`solidifyGen(${prf}):\n${e}`) 
+		};
+
+	} else if(ts.color.length != imsz) { // update color if diff length
+		ts.color = new Array(imsz);
+		try { this.code[prf](ts.color) } catch(e) { elogErr(`solidifyUpd(${prf}):\n${e}`) };
+	}
+
+	ts.instmesh = newIMesh(gen, ts.instmesh, ts.geo, ts.mat, imsz);
+
+	const imnew = ts.instmesh;
+
+	const pdata = ts.pdata = ts.pdata || {};
+	const pcfg = ts.petals;
+	if(pcfg) {
+		if(gen) {
+			[pdata.idx, pdata.vert, pdata.norm] = getGeoData(ts.geo, pcfg.center, pcfg.offset, pcfg.usenormals);
+			pdata.len = pdata.idx.length;
+			if(pcfg.hasOwnProperty('shineThrough')) translucency_146(pcfg.mat, pcfg.shineThrough);
+		}
+
+		const sz = imsz * pdata.len;
+		ts.ptlmesh = newIMesh(gen, ts.ptlmesh, pcfg.geo, pcfg.mat, sz);
+
+		pdata.ybias = [deg_to_rad * pcfg.ybias[0], deg_to_rad * pcfg.ybias[1]];
+		pdata.ybdif = pdata.ybias[1] - pdata.ybias[0];
+		pdata.yb = pdata.ybias[1] || pdata.ybias[0];
+
+		pdata.anim = [];
+	
+	} else if(ts.ptlmesh) disposeIMesh(ts.ptlmesh);
+
+	const pmnew = ts.ptlmesh;
+
+	// align mesh to path
+	let ipos = 0;
+	let s = 0;
+	let attf = 1 / Math.max(endp[0] - 3 - s, 1);
+	const q_mtx = new THREE.Matrix4();
+	const sc_mtx = new THREE.Vector3();
+	
+	ts.anim = [];
+
+	let q;
+	for(let i = 0; i < _v.length - 3; i+=3) {
+		const nxt = i + 3;
+		if(i == endp[0]) { 
+			s = endp.shift() + 3;
+			attf = 1 / Math.max(endp[0] - 3 - s, 1);
+			continue; // don't connect between branches
+		}
+		const [bs, by, bz, mod] = norm2([_v[nxt] - _v[i], _v[nxt + 1] - _v[i + 1], _v[nxt + 2] - _v[i + 2]]); 
+		if(html[prf + 'follow'].checked) {
+			const qxz = followXZProj([_v[nxt] - _v[i], _v[nxt + 2] - _v[i + 2]], -Math.PI);
+			q = quaternAdd(...quaternFromVects([0, 1, 0], [bs, by, bz]), ...qxz);
+		} else {
+			q = quaternFromVects([0, 1, 0], [bs, by, bz]);
+		}
+
+		const att = 1 - ts.attenuation * (i - s) * attf;
+		const sfact = mod / ts.height;
+		const asf = att * sfact;
+		if(ts.uniscale) sc_mtx.set(asf, sfact, asf);
+		else sc_mtx.set(att, sfact, att);
+
+		q_mtx.compose(
+			new THREE.Vector3(_v[i], _v[i + 1], _v[i + 2]), 
+			new THREE.Quaternion(q[1], q[2], q[3], q[0]),
+			sc_mtx );
+
+		ts.anim[ipos] = {
+			pos: [_v[i], _v[i + 1], _v[i + 2]], 
+			sc: ts.uniscale ? [asf, sfact, asf] : [att, sfact, att],
+			q,  
+		};
+
+		// petals
+		if(pcfg) {
+			const mtx = new THREE.Matrix4();
+			const pv = pdata.vert;
+			const j0 = ipos * pdata.len;
+			for(let j = j0; j < j0 + pdata.len; j++) {
+				const k = j - j0;
+				const vi = k * 3;
+				let qyb, qt;
+				if(pdata.yb) { // rotate around X first
+					const ang = (pdata.ybdif * rand() + pdata.ybias[0]) / 2;
+					qyb = [Math.cos(ang), Math.sin(ang), 0, 0]; 
+				}
+				let npn;
+				if(pcfg.usenormals) {
+					// to align petals with vertices' normals
+					const pdn = pdata.norm;
+					const pn = [pdn[vi] * sc_mtx.x, pdn[vi + 1] * sc_mtx.y, pdn[vi + 2] * sc_mtx.z];
+					const qxz = followXZProj([pn[0], pn[2]]);
+					npn = norm([pn[0], pn[1], pn[2]]);
+					const qvn = quaternFromVects([0, 1, 0], npn);
+					const qfn = quaternAdd(...qvn, ...qxz);
+
+					const qn = qyb ? quaternAdd(...qfn, ...qyb) : qfn;
+					qt = quaternAdd(...q, ...qn);
+				} else {
+					qt = qyb ? quaternAdd(...q, ...qyb) : q;
+				}
+				mtx.makeRotationFromQuaternion(new THREE.Quaternion(qt[1], qt[2], qt[3], qt[0]));
+				const pos = multVec16CM(q_mtx.elements, [pv[vi], pv[vi + 1], pv[vi + 2], 1]); 
+				mtx.setPosition(pos[0], pos[1], pos[2]);
+				pmnew.setMatrixAt(j, mtx);
+				const clr = pcfg.color;
+				if(clr) pmnew.setColorAt(j, clr[j] || clr[k]);
+
+				pdata.anim[j] = { segDir: [bs, by, bz], q: [...qt], sc: [1, 1, 1], pos: [...pos] };
+				if(npn) pdata.anim[j].nrm = [...npn];
+			}
+		}
+
+		imnew.setMatrixAt(ipos, q_mtx);
+		imnew.setColorAt(ipos, ts.color[ipos++]);
+	}
+
+	if(ts.renderOrder) imnew.renderOrder = ts.renderOrder;
+
+	imnew.instanceMatrix.needsUpdate = true;
+	imnew.instanceColor.needsUpdate = true;
+	this.solid.add(imnew);
+
+	const vis = html[prf + 'rend_solid'].checked;
+
+	if(pcfg) {
+		if(pcfg.renderOrder) pmnew.renderOrder = pcfg.renderOrder;
+		pmnew.instanceMatrix.needsUpdate = true;
+		this.solid.add(pmnew);
+		pmnew.visible = vis;
+	}
+
+	imnew.visible = vis;
+}
+TREE.prototype.updateCode = function (prf) {
+	const def = `
+	mesh.uniscale = mesh.uniscale || false;
+	mesh.attenuation = mesh.attenuation ?? 0.66;
+	`;
+	let str = html[prf + 'code'].value + def;
+	['mesh', 'petals'].forEach(nm => { str = str.replaceAll(nm, 'cfg.' + nm) });
+
+	try { 
+		elog('');
+		this.code[prf] = eval(`(color => {\nconst cfg = {};\n${str}\nreturn cfg;\n})`);
+	} 
+	catch(e) { 
+		elogErr(`updateCode(${prf}):\n${e}`);
+	};
+}
+TREE.prototype.updateAnim = function (prf) {
+	const str = html[prf + 'anim'].value;
+	if(!str.length) {
+		delete this.animate[prf];
+		return 1;
+	}
+
+	const ch = prf[prf.length - 1];
+	const flg = ch == '_';
+	const sobj = flg ? 'this.trunk' : `this.branches[${ch}]`;
+	const ich = parseInt(ch);
+	const par = ich == 0 ? 'this.trunk' : `this.branches[${ich - 1}]`;
+	const update = flg ? 'this.updateTrunk()' : `this.updateBranches(${ch}, ${par}.q, ${par}._v)`;
+	const cfg = `
+	const data_ = ${sobj};
+	const solid = data_.solid;
+	const imesh = solid?.instmesh;
+	const petals = solid?.ptlmesh;
+	const frame = state.frm;
+	const G = this.animate.${prf}.global;
+	`;
+ 
+	const reg_spt = /(get|set)Petal\(([\w\W]+?)\)/g;
+
+	const txt = str
+	.replaceAll('updatePath()', update)
+	.replaceAll('getBloomDirs()', 'getBloomDirs(solid)')
+	.replace(reg_spt,
+		function () {
+			return `${arguments[1]}Petal(${arguments[2]}, solid)`;
+		});
+
+	this.animate[prf] = this.animate[prf] || { pl: 0, global: {} };
+	try {
+		elog('');
+		this.animate[prf].code = eval(`(function anim() {${cfg}${txt}\n})`).bind(this);
+	} catch(e) { 
+		elogErr(`updateAnim(${prf}):\n${e}`);
+		return 1;
+	};
+	return 0;
+}
+// code helper functions
+const dummy = {
+q: new THREE.Quaternion(),
+m4: new THREE.Matrix4(),
+sc: new THREE.Vector3(),
+pos: new THREE.Vector3(),
+rgb: new THREE.Color(),
+};
+const getImesh = (i, solid) => {
+	const anim = solid.anim[i];
+	const [pos, sc] = [anim.pos, anim.sc];
+	return {
+		sc: {_x: pos[0], _y: pos[1], _z: pos[2]},
+		pos: {_x: sc[0], _y: sc[1], _z: sc[2]},
+		q: anim.q,
+	};
+}
+const setImesh = (i, obj, solid) => {
+	const anim = solid.anim[i];
+	const imesh = solid.instmesh;
+
+	for(const nm of ['sc', 'pos']) {
+		const anm = anim[nm];
+		const atr = {x: anm[0], y: anm[1], z: anm[2]};
+		const otr = obj[nm];
+		for(const s in otr) {
+			const d = s[1] || s[0];
+			atr[d] = s[0] == '_' ? otr[s] : otr[s] + atr[d];
+		}
+		dummy[nm].set(atr.x, atr.y, atr.z);
+	}
+
+	const qt = obj.q ? quaternAdd(...obj.q, ...anim[i].q) : obj._q ? obj._q : anim[i].q;
+   dummy.q.set(qt[1], qt[2], qt[3], qt[0]);
+
+	dummy.m4.compose(dummy.pos, dummy.q, dummy.sc);
+	imesh.setMatrixAt(i, dummy.m4);
+
+	if(obj.rgb) imesh.setColorAt(i, dummy.rgb.set(obj.rgb));
+}
+const getBloomDirs = solid => {
+	const anim = solid.pdata.anim;
+	const len = solid.ptlmesh.count;
+	const arr = new Array(len);
+	for(let i = 0; i < len; i++) {
+		const ai = anim[i];
+		const petDir = quaternRotate(0, 1, 0, ...ai.q);
+		arr[i] = norm(cross(...ai.segDir, ...petDir));
+	}
+	return arr;
+}
+const getPetal = (i, solid) => {
+	const anim = solid.pdata.anim[i];
+	anim.nrm = anim.nrm || [0, 0, 0];
+	let cnt;
+	const obj = {};
+	for(const pr of ['sc', 'pos', 'nrm']) {
+		cnt = 0;
+		obj[pr] = {};
+		for(const nm of ['_x', '_y', '_z']) obj[pr][nm] = anim[pr][cnt++];
+	}
+	obj.q = anim.q;
+	obj.segDir = anim.segDir;
+	return obj;
+}
+const setPetal = (i, obj, solid) => {
+	const anim = solid.pdata.anim[i];
+	const petals = solid.ptlmesh;
+
+	for(const nm of ['sc', 'pos']) {
+		const anm = anim[nm];
+		const atr = {x: anm[0], y: anm[1], z: anm[2]};
+		const otr = obj[nm];
+		for(const s in otr) {
+			const d = s[1] || s[0];
+			atr[d] = s[0] == '_' ? otr[s] : otr[s] + atr[d];
+		}
+		dummy[nm].set(atr.x, atr.y, atr.z);
+	}
+
+	const qt = obj.q ? quaternAdd(...obj.q, ...anim.q) : obj._q ? obj._q : anim.q;
+   dummy.q.set(qt[1], qt[2], qt[3], qt[0]);
+
+	dummy.m4.compose(dummy.pos, dummy.q, dummy.sc);
+	petals.setMatrixAt(i, dummy.m4);
+
+	if(obj.rgb) petals.setColorAt(i, dummy.rgb.set(obj.rgb));
+}
+// 3D
+const canvas = get('main_canvas');
+const [w, h] = [canvas.width, canvas.height];
+const renderer = new THREE.WebGLRenderer({
+antialias: true,
+canvas: canvas,
+});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(w, h);
+// scene template
+const setSceneTemplate = () => {
+camera.near = 1;
+camera.far = 100;
+camera.fov = 45;
+camera.position.set(9, 12, 9);
+camera.lookAt(0, 0, 0);
+
+scene.background = new THREE.Color(sett_bg);
+
+const lightA = new THREE.AmbientLight(0xffffff, 0.2);
+const lightD = new THREE.DirectionalLight(0xffffff, 1.1);
+
+lightD.position.set(20, 20, 100);
+
+const grnd = new THREE.Mesh(
+	new THREE.PlaneGeometry(10, 10), 
+	new THREE.MeshBasicMaterial({ color: new THREE.Color(sett_gr)})
+);
+
+aniOverlayColor = [sett_ao];
+camOverlayColor = [sett_co];
+};
+const sett = {
+scene: new THREE.Scene(),
+camera: new THREE.PerspectiveCamera(45, w / h, 1, 1),
+axhlp: new THREE.AxesHelper(1),
+get code() {
+let str = setSceneTemplate.toString().slice(8, -2);
+['bg', 'gr', 'ao', 'co'].forEach(nm => {
+str = str.replace('sett_' + nm, sett[nm].join(', '))
+});
+return str;
+},
+bg: [0.01, 0.01, 0.15],
+gr: [0.137, 0.2, 0],
+ao: [.8, .8, .8],
+co: [.8, .8, .8],
+bg_: [0.01, 0.01, 0.15],
+gr_: [0.137, 0.2, 0],
+ao_: [.8, .8, .8],
+co_: [.8, .8, .8],
+};
+// create scene
+const list = ['grnd', 'axhlp', 'lightA', 'lightD'];
+let str = sett.code;
+['camera', 'lightA', 'lightD', 'grnd'].forEach(nm => {
+const re = new RegExp(`(const )?${nm}`, 'g');
+str = str.replace(re, 'sett.' + nm);
+});
+str = str
+.replace('aniOverlayColor', 'sett.ao')
+.replace('camOverlayColor', 'sett.co')
+.replace('scene', 'sett.scene');
+// run
+const func = eval(`() => {${str}}`);
+func();
+// post
+sett.camera.updateProjectionMatrix();
+sett.grnd.rotation.set(-Math.PI / 2, 0, 0);
+sett.grnd.position.set(0, -0.01, 0);
+list.forEach(nm => { sett.scene.add(sett[nm]) });
+// ANIMATION
+const state = {
+pl_: 0,
+get pl() { return state.pl_ }, set pl(v) { state.pl_ = v; animate(); },
+frm: 0,
+rate_: 0,
+get rate() { return state.rate_ }, set rate(v) { state.rate_ = v; state.fint = 1000 / v; },
+fint: 0,
+};
+state.rate = 60;
+let elapsed, now, then;
+const render = () => { 
+  renderer.render(sett.scene, sett.camera); 
+}
+const maybeRender = () => { if (!state.pl) render() }
+const animateTree = () => {
+	for(const prf in tree.animate) {
+		const anim = tree.animate[prf];
+		if(anim.pl) anim.code();
+	}
+}
+const animate = newtime => {
+	const sb = html?.statbtn?.swData?.state;
+	if(!state.pl && !sb) return;
+	requestAnimationFrame(animate);
+
+	if(!newtime) then = newtime = window.performance.now();
+
+	now = newtime;
+	elapsed = now - then;
+
+	if (!state.fint || elapsed > state.fint) {
+
+		then = now - (elapsed % state.fint);
+
+		if (sb) stats.update();
+		if(!state.pl) return;
+
+		if(tree) animateTree();
+
+		render();
+		
+	}
+}
+html.allplay = { click: () => {
+for(const prf in tree.animate)
+tree.animate[prf].pl = true;
+state.pl = 1;
+} };
+// INIT
+let tree;
+[GET.group, GET.name] = [data.grp, data.name];
+load(false, data);
+render();
+
+</script>
+</body>
+</html>

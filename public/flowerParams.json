@@ -1,0 +1,64 @@
+{
+    "radiusTop": {
+      "range": 0.5,
+      "lifecycle": [0.3, 0.52, 1.09, 1.09, 0.2]
+    },
+    "radiusBottom": {
+      "range": 0.5,
+      "lifecycle": [0.3, 0.52, 1.09, 1.09, 0.2]
+    },
+    "noiseScale": {
+      "range": 0.5,
+      "lifecycle": [0.46, 1.95, 1.03, 1.31, 0.01]
+    },
+    "noiseImpactX": {
+      "range": 0.5,
+      "lifecycle": [0.46, 0.5, 0.5, 0.5, 0.39]
+    },
+    "noiseImpactY": {
+      "range": 0.5,
+      "lifecycle": [0.34, 0.5, 0.94, 2.63, 2.63]
+    },
+    "noiseImpactZ": {
+      "range": 0.5,
+      "lifecycle": [0, 0, 1, 0.94, 0.94]
+    },
+    "shape_Height": {
+      "range": 0.5,
+      "lifecycle": [0.16, 0.04, 0.04, 0.04, 0.01]
+    },
+    "radialSegments": {
+      "range": 0.5,
+      "lifecycle": [100, 100, 100, 11.88, 11.88]
+    },
+    "bloomRotationX": {
+      "range": 0.5,
+      "lifecycle": [0, 0.03, -0.38, -0.38, -0.71]
+    },
+    "bloomRotationY": {
+      "range": 0.5,
+      "lifecycle": [0, 0, 0.07, 0.07, 0.07]
+    },
+    "bloomRotationZ": {
+      "range": 0.5,
+      "lifecycle": [0, 0, -0.43, -0.43, -0.43]
+    },
+    "recRadius": {
+      "range": 0.5,
+      "lifecycle": [0.16, 0.17, 0.2, 0.2, 0.11]
+    },
+    "recPositionY": {
+      "range": 0.5,
+      "lifecycle": [5, 5, 5, 5, 5]
+    },
+    "stemHeight": {
+      "range": 0.5,
+      "lifecycle": [0.7, 1.76, 7, 5.47, 2.39]
+    },
+    "stemWidth": {
+      "range": 0.5,
+      "lifecycle": [0.4, 0.4, 0.4, 0.4, 0.4]
+    },
+    "lifetime": 3600000
+  }
+  

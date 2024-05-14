@@ -29,11 +29,11 @@ const PlantBuilder = () => {
 
     const NoisyCylinder = ({ shape }) => {
         const meshRef = useRef();
-        const noise = new Noise(shape.seed);  
-
+        const noise = new Noise(shape.seed);
+    
         useEffect(() => {
             if (!meshRef.current) return;
-
+    
             const geometry = new THREE.CylinderGeometry(
                 shape.radiusTop,
                 shape.radiusBottom,
@@ -41,24 +41,30 @@ const PlantBuilder = () => {
                 shape.radialSegments
             );
             const positions = geometry.attributes.position.array;
-
             for (let i = 0; i < positions.length; i += 3) {
                 const x = positions[i];
                 const y = positions[i + 1];
                 const z = positions[i + 2];
                 positions[i + 2] += noise.perlin3(x * shape.noiseScale, y * shape.noiseScale, z * shape.noiseScale) * shape.noiseImpactZ;
             }
-
             geometry.attributes.position.needsUpdate = true;
             geometry.computeVertexNormals();
-
+    
+            // Store custom parameters in userData
+            meshRef.current.userData.noiseParams = {
+                noiseScale: shape.noiseScale,
+                noiseImpactX: shape.noiseImpactX,
+                noiseImpactY: shape.noiseImpactY,
+                noiseImpactZ: shape.noiseImpactZ
+            };
+    
             meshRef.current.geometry.dispose();  
             meshRef.current.geometry = geometry; 
         }, [shape]);
-
+    
         return (
             <Cylinder
-            onClick={handleClick}
+                onClick={handleClick}
                 ref={meshRef}
                 args={[
                     shape.radiusTop,
@@ -72,28 +78,44 @@ const PlantBuilder = () => {
             </Cylinder>
         );
     };
+    
 
     
     const handleClick = (event) => {
-            setEditShape(event)
-      };
+        console.log(event.object)
+        const noiseScale = event.object.noiseScale;
+        const noiseImpactX = event.object.noiseImpactX;
+        const noiseImpactY = event.object.noiseImpactY;
+        const noiseImpactZ = event.object.noiseImpactZ;
+        const noiseData = event.object.userData.noiseParams; 
+        if (noiseData) {
+            console.log(noiseData.noiseScale);
+            console.log(noiseData.noiseImpactX);
+            console.log(noiseData.noiseImpactY);
+            console.log(noiseData.noiseImpactZ);
+        }
+        const { position, rotation, scale } = event.object;
+        setEditShape({
+            position: position.toArray(),
+            rotation: rotation.toArray(),
+            scale: scale.toArray(),
+            noiseScale: noiseData.noiseScale,
+            NoiseImpactX: noiseData.noiseImpactX,
+            NoiseImpactY: noiseData.noiseImpactY,
+            NoiseImpactZ: noiseData.noiseImpactZ,
+        });
 
-      useEffect(() => {
-        let params
+    };
 
-        if(editShape){
-            console.log(editShape)
-        params = Object.entries(editShape).map((param) => {
-            return(
-                <>{param}</>
-            )
-        })
-    }
-
-        setShapeParams(params)
-
-        console.log(shapeParams)
-      }, [editShape])
+    useEffect(() => {
+        let params;
+        if (editShape) {
+            params = Object.entries(editShape).map(([key, value]) => {
+                return <p key={key}>{`${key}: [${value}]`}</p>;
+            });
+            setShapeParams(params);
+        }
+    }, [editShape]);
 
     return (
         <div style={{ display: 'flex', height: '97vh', width: '98vw', background: 'black' }}>
@@ -105,7 +127,7 @@ const PlantBuilder = () => {
                     ))}
                 </select>
             </div>
-                <div id='shapeParams'>
+                <div id='shapeParams' style={{background: 'white'}}>
                     {shapeParams && shapeParams}
                 </div>
             <Canvas>

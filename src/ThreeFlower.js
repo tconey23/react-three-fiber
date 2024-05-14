@@ -1,54 +1,80 @@
-import React, { useRef } from 'react';
-import { Canvas, useLoader, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import React, { useRef, useEffect, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Sphere, Cylinder } from '@react-three/drei';
 import Leaf from './Leaf';
-import BloomModel from './Bloom';
 
-function ThreeFlower({ rotationX = 55, rotationY = 0, rotationZ = 0, scale = [0.1, 0.1, 0.1], ...props }) {
-  const leafRef = useRef();
+function ThreeFlower(props) {
+  const stemRef = useRef();
+  const bloomRef = useRef();
+  const pedalsRef = useRef();
 
+  console.log(props.geoParams)
+
+  const [isAnimating, setIsAnimating] = useState(true);
   useFrame(() => {
-    // leafRef.current.rotation.y += 0.01;
+    if (isAnimating) {
+      // bloom.current.children[1].geometry.parameters.radiusTop -= 0.1
+    }
   });
 
-  // Define leaf shape
-  const leafShape = new THREE.Shape();
-  leafShape.moveTo(0, 0);
-  leafShape.quadraticCurveTo(10, 5, 0, 10);
-  leafShape.quadraticCurveTo(-10, 5, 0, 0);
+  const [flowerPedals, setFlowerPedals] = useState([]);
+  const colorArray = ['red', 'blue', 'green', 'purple'];
 
-  // Define leaf geometry
-  const leafGeometry = new THREE.ExtrudeGeometry(leafShape, {
-    steps: 2,
-    depth: 0.1,
-    bevelEnabled: false,
-  });
+  useEffect(() => {
+    const pedalArray = [];
+    let c = 0;
 
-  const center = [0, 0, 0];
-  const offsetX = 1.4;
-  const offsetY = 0;
-  const offsetZ = -1.5;
+    for (let i = 0; i < 1; i += 1) {
+      pedalArray.push(
+        <Leaf
+          key={i}
+          positionX={0}
+          positionY={0}
+          positionZ={0}
+          rotationX={0}
+          rotationY={0}
+          rotationZ={0}
+          color={colorArray[c]}
+          geoParams={props.geoParams}
+        />
+      );
+      c = (c + 1) % colorArray.length;
+    }
+
+    setFlowerPedals(pedalArray);
+  }, [props.geoParams]);
+
+  const recepticle = () => {
+    return (
+      <Sphere position={[0, 0, 0]} args={[props.geoParams.recRadius]}>
+        <meshStandardMaterial color="yellow" />
+      </Sphere>
+    );
+  };
+
+  console.log(bloomRef)
 
   return (
-    <>
-        <mesh color="green" position={center}>
-          <cylinderGeometry args={[0.1, 0.1, 10]} />          
-          <meshStandardMaterial color="green"/>
-        </mesh>
-        <mesh>
-          <Leaf position={[0, 0, 0]} rotationZ={0} rotationY={0} rotationX={2} />
-        </mesh>
-        <mesh>
-          <Leaf position={[0, -0.5, 0]} rotationY={45} rotationZ={15} rotationX={45} /> 
-        </mesh>
-        <mesh>
-          <Leaf position={[0, 2.5, 0]} rotationY={45} rotationZ={25} rotationX={180} />
-        </mesh>
-        {/* <mesh   position={[0,5,0]}>
-            <BloomModel />
-        </mesh> */}
+    <mesh position={props.position}>
+      <group>
+        {/* The stem */}
+        <Cylinder
+          ref={stemRef}
+          position={[0, 0, 0]}
+          args={[props.geoParams.stemWidth, props.geoParams.stemWidth, props.geoParams.stemHeight]}
+        >
+          <meshStandardMaterial color="green" />
+        </Cylinder>
         
-    </>
+        {/* The bloom, attached to the top of the stem */}
+        <group ref={bloomRef} rotation={[props.geoParams.bloomRotationX, props.geoParams.bloomRotationY, props.geoParams.bloomRotationZ]} position={[0, props.geoParams.stemHeight / 2, 0]}>
+          <Sphere position={[0, 0, 0]} args={[props.geoParams.recRadius]}>
+            <meshStandardMaterial color="yellow" />
+          </Sphere>
+          {flowerPedals}
+        </group>
+      </group>
+    </mesh>
   );
 }
 

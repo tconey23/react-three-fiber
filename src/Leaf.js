@@ -1,44 +1,50 @@
-import React, { useRef } from 'react';
-import { Canvas, useLoader, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import React, { useRef, useEffect, useState } from 'react'
+import { Cylinder } from '@react-three/drei'
+import * as THREE from 'three'
+import { Noise } from 'noisejs'
 
-function Leaf({ rotationX = 45, rotationY = 0, rotationZ = 0, scale = [0.25, 0.25, 0.25], ...props }) {
-  const leafRef = useRef();
+function Leaf({ color, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, geoParams }) {
+  const meshRef = useRef()
+  const noise = new Noise(123456)
 
-  useFrame(() => {
-    // leafRef.current.rotation.y += 0.01;
-  });
+  useEffect(() => {
+    const { radiusTop, radiusBottom, shape_Height, radialSegments, noiseScale, noiseImpactX, noiseImpactY, noiseImpactZ } = geoParams
 
-  // Define leaf shape
-  const leafShape = new THREE.Shape();
-  leafShape.moveTo(0, 0);
-  leafShape.quadraticCurveTo(2, 5, 2, -10);
-  leafShape.quadraticCurveTo(-10, 5, 0, 0);
+    const geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, shape_Height, radialSegments)
 
-  // Define leaf geometry
-  const leafGeometry = new THREE.ExtrudeGeometry(leafShape, {
-    steps: 2,
-    depth: 0.10,
-    bevelEnabled: false,
-  });
+    const positions = geometry.attributes.position.array
+    for (let i = 0; i < positions.length; i += 3) {
+      const x = positions[i]
+      const y = positions[i + 1]
+      const z = positions[i + 2]
 
-  const center = [0, 0, 0];
-  const offsetX = 1.4;
-  const offsetY = 0;
-  const offsetZ = -1.5;
+      const displacementX = noise.perlin3(x * noiseScale, y * noiseScale, z * noiseScale) * noiseImpactX
+      const displacementY = noise.perlin3(x * noiseScale, y * noiseScale, z * noiseScale) * noiseImpactY
+      const displacementZ = noise.perlin3(x * noiseScale, y * noiseScale, z * noiseScale) * noiseImpactZ
+
+      positions[i] += displacementX
+      positions[i + 1] += displacementY
+      positions[i + 2] += displacementZ
+    }
+
+    geometry.attributes.position.needsUpdate = true
+    geometry.computeVertexNormals()
+    geometry.computeBoundingSphere()
+
+    if (meshRef.current) {
+      meshRef.current.geometry = geometry
+    }
+  }, [geoParams])
 
   return (
-    <>
-        <mesh color="green" position={center}>
-          <cylinderGeometry args={[0.1, 0.1, 10]} />          
-          <meshPhongMaterial color="green"/>
-        </mesh>
-        <mesh {...props} rotation={[rotationX, rotationY, rotationZ]} scale={scale}>
-        <bufferGeometry attach="geometry" {...leafGeometry} />
-        <meshPhongMaterial color="green" />
-      </mesh>
-    </>
-  );
+    <mesh
+      ref={meshRef}
+      rotation={[rotationX, rotationY, rotationZ]}
+      position={[positionX, positionY, positionZ]}
+    >
+      <meshLambertMaterial attach="material" color={color} />
+    </mesh>
+  )
 }
 
-export default Leaf;
+export default Leaf

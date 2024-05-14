@@ -157,7 +157,7 @@ function ThreeDNoise() {
         {Object.entries(settings).map(([key, value]) => (
           <label key={key}>
             {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: 
-            <input type="number" min="0" max="100" step="0.01" value={value} onChange={(e) => updateSetting(key, e.target.value)} />
+            <input type="number" min="-100" max="100" step="0.01" value={value} onChange={(e) => updateSetting(key, e.target.value)} />
           </label>
         ))}
         <button onClick={saveSettings}>Save Settings</button>
