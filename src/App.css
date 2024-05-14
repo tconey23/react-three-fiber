@@ -36,3 +36,14 @@ form{
 canvas{
     position: fixed;
 }
+
+#addLayer{
+    position: fixed;
+    top: 0;
+    left: 410px;
+    color: black;
+}
+
+#collCont {
+    margin-top: 16px;
+}
