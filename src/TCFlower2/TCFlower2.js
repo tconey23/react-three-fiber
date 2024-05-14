@@ -59,7 +59,7 @@ const TCFlower2 = () => {
           rotation={[lathe.rotation.x, lathe.rotation.y, lathe.rotation.z]}
         >
           <latheGeometry args={[points, lathe.segments, lathe.phiStart, lathe.phiLength]} />
-          <meshLambertMaterial color={'green'} />
+          <meshLambertMaterial color={'#165D01'} />
         </mesh>
       );
     });
@@ -252,10 +252,11 @@ const TCFlower2 = () => {
       </div>
       <Canvas style={{ width: '100vw', height: '95vh', backgroundColor: 'black' }}>
         <ambientLight intensity={1} />
+        <directionalLight intensity={10} castShadow position={[0, 0, -6]} shadow-mapSize={[1024, 1024]} />
         <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
         {generateLatheLayers()}
         <Cylinder position={[0, 0.1, 0]} args={[0.7, 0.7, 0.01]}>
-          <meshLambertMaterial color={'green'} />
+          <meshPhongMaterial color={'#1C7801'} />
         </Cylinder>
         <OrbitControls />
       </Canvas>

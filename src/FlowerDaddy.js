@@ -5,19 +5,22 @@ import { Noise } from 'noisejs';
 import { TubeGeometry, CatmullRomCurve3, Vector3 } from 'three';
 import Leaf from './Leaf';
 
-function ThreeFlower(props) {
-  const stemRef = useRef();
-  const bloomRef = useRef();
-  const tubeRef = useRef();
 
-  console.log(props)
-  
-  const pathPoints = [
+const FlowerDaddy = (props) => {
+
+const [flowerPedals, setFlowerPedals] = useState([]);
+const colorArray = ['red', 'blue', 'green', 'purple'];
+const bloomRef = useRef();
+const tubeRef = useRef();
+const {flower, position, rotation, currentStage} = props
+
+const pathPoints = [
     [0.5, 0, 0], 
     [0.5, 0, 0],
     [0.5, 0, 0.8],
-    [0.1, props.geoParams.stemHeight, 0]  
+    [0.1, flower.stemHeight.lifecycle[currentStage], 0]  
   ]
+
 
   const tubularSegments = 100;
   const radius = 0.14;
@@ -30,11 +33,6 @@ function ThreeFlower(props) {
     return new TubeGeometry(curve, tubularSegments, radius, radialSegments, closed);
   }, [pathPoints, tubularSegments, radius, radialSegments, closed]);
 
-  const [isAnimating, setIsAnimating] = useState(true);
-  const noise = new Noise(Math.random());
-
-  const [flowerPedals, setFlowerPedals] = useState([]);
-  const colorArray = ['red', 'blue', 'green', 'purple'];
 
   useEffect(() => {
     const pedalArray = [];
@@ -51,33 +49,34 @@ function ThreeFlower(props) {
           rotationY={i+100}
           rotationZ={0}
           color={colorArray[c]}
-          geoParams={props.geoParams}
+          flower={flower}
+          currentStage={currentStage}
         />
       );
       c = (c + 3) % colorArray.length;
     }
 
     setFlowerPedals(pedalArray);
-  }, [props.geoParams]);
+  }, [flower]);
 
-  return (
-    <mesh position={props.position}>
-      <group>
-        <group ref={bloomRef} rotation={[props.geoParams.bloomRotationX, props.geoParams.bloomRotationY, props.geoParams.bloomRotationZ]} position={[0, props.geoParams.stemHeight, 0]}>
-          <Sphere position={[0, 0, 0.1]} args={[props.geoParams.recRadius]}>
-            <meshStandardMaterial color="yellow" />
-          </Sphere>
-          {/* <Cylinder position={[0, -0.5, 0.05]} args={[0.25,0.14,1]}>
+    return (
+        <mesh position={position}>
+        <group>
+          <group ref={bloomRef} rotation={[flower.bloomRotationX.lifecycle[currentStage], flower.bloomRotationY.lifecycle[currentStage], flower.bloomRotationZ.lifecycle[currentStage]]} position={[0, flower.stemHeight.lifecycle[currentStage], 0]}>
+            <Sphere position={[0, 0, 0.1]} args={[flower.recRadius]}>
+              <meshStandardMaterial color="yellow" />
+            </Sphere>
+            {/* <Cylinder position={[0, -0.5, 0.05]} args={[0.25,0.14,1]}>
+              <meshStandardMaterial color="green" />
+            </Cylinder> */}
+            {flowerPedals}
+          </group>
+          <mesh ref={tubeRef} geometry={geometry} position={[0, 0, 0]}>
             <meshStandardMaterial color="green" />
-          </Cylinder> */}
-          {flowerPedals}
+          </mesh>
         </group>
-        <mesh ref={tubeRef} geometry={geometry} position={[0, 0, 0]}>
-          <meshStandardMaterial color="green" />
-        </mesh>
-      </group>
-    </mesh>
-  );
+      </mesh>
+    )
 }
 
-export default ThreeFlower;
+export default FlowerDaddy

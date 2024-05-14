@@ -9,6 +9,7 @@ import ThreeDNoise from './3DNoise';
 import TwoDNoise from './2DNoise';
 import Sandbox from './Sandbox';
 import TCFlower2 from './TCFlower2/TCFlower2';
+import FlowerDataTest from './FlowerDataTest';
 
 function App() {
   
@@ -21,6 +22,7 @@ function App() {
       <Link to={'/3dNoise'}> | 3d Noise Editor | </Link>
       {/* <Link to={'/2dNoise'}> | 2d Noise Editor | </Link> */}
       <Link to={'/Builder'}> | Plant Builder | </Link>
+      <Link to={'/FlowerDataTest'}> | Flower Data Test | </Link>
     </nav>
     <Routes>
       <Route path={'/'} element={<Sandbox />}/>
@@ -28,6 +30,7 @@ function App() {
       {/* <Route path={'/2DNoise'} element={<TwoDNoise />}/> */}
       <Route path={'/3DNoise'} element={<ThreeDNoise />}/>
       <Route path={'/Builder'} element={<PlantBuilder />}/>
+      <Route path={'/FlowerDataTest'} element={<FlowerDataTest />}/>
     </Routes>
  
     </>

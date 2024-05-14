@@ -3,10 +3,9 @@ import { Cylinder } from '@react-three/drei'
 import * as THREE from 'three'
 import { Noise } from 'noisejs'
 
-function Leaf({ color, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, geoParams}) {
+function Leaf({ color, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, geoParams }) {
   const meshRef = useRef()
   const noise = new Noise(123456)
-
 
   useEffect(() => {
     const { radiusTop, radiusBottom, shape_Height, radialSegments, noiseScale, noiseImpactX, noiseImpactY, noiseImpactZ } = geoParams
@@ -37,13 +36,33 @@ function Leaf({ color, positionX, positionY, positionZ, rotationX, rotationY, ro
     }
   }, [geoParams])
 
+  const textureLoader = new THREE.TextureLoader();
+  const textureLoader2 = new THREE.TextureLoader();
+  const displacementMap = textureLoader2.load('/DisplacementMap.png');
+  const normalMap = textureLoader.load('/NormalMap.png');
+  // const displacementMap = textureLoader2.load('/DispMapRidge.png');
+  // const normalMap = textureLoader.load('/NormalMapRidge.png');
+  // const displacementMap = textureLoader2.load('/DisplacementTest2.png');
+  // const normalMap = textureLoader.load('/NormalTest2.png');
+
+  // console.log('dm', displacementMap)
+
+  const petalMaterial = new THREE.MeshStandardMaterial({
+    color: 'red',
+    // roughness: 0.1,
+    metalness: 0.9,
+    // emissive: 'blue',
+      // displacementMap: displacementMap,
+      // normalMap: normalMap
+  });
+
   return (
-    <mesh
+    <mesh material={petalMaterial}
       ref={meshRef}
       rotation={[rotationX, rotationY, rotationZ]}
       position={[positionX, positionY, positionZ]}
     >
-      <meshLambertMaterial attach="material" color={color} />
+      {/* <meshLambertMaterial attach="material" color={color} /> */}
     </mesh>
   )
 }
