@@ -1,22 +1,19 @@
 import React from 'react';
 import { useState } from 'react';
 
-export default function Sliders({updateLeafDimensions}) {
+export default function Sliders({leafDimensions, updateLeafDimensions}) {
     const [ formData, setFormData ] = useState({ r1: 0, r2: 0, r3: 0, r4: 0 })
 
-    
     function handleChange(event) {
         setFormData(prev => {
-          return (
-              {
-                  ...prev,
-                  [event.target.id]: event.target.value
-              }
-          )
-        })
-
-        updateLeafDimensions(formData)
-      }
+            const updatedFormData = {
+                ...leafDimensions,
+                [event.target.id]: event.target.value
+            };
+            updateLeafDimensions(updatedFormData);
+            return updatedFormData;
+        });
+    }
 
     return (
         <div className="slidecontainer">

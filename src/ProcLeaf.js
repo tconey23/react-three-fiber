@@ -6,15 +6,23 @@ import { OrbitControls } from '@react-three/drei';
 
 function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 0.25, 0.25], leafDimensions, ...props }) {
   const [leafChange, setLeafChange] = useState(true)
-  const [leafShape, setLeafShape ] = useState(null)
-  const [leafShape2, setLeafShape2 ] = useState(null)
-  const [leafGeometry, setLeafGeometry ] = useState(null)
-  const [leafGeometry2, setLeafGeometry2 ] = useState(null)
+  const [leafShape, setLeafShape ] = useState(new THREE.Shape())
+  const [leafShape2, setLeafShape2 ] = useState(new THREE.Shape())
+  const [leafGeometry, setLeafGeometry ] = useState((new THREE.ExtrudeGeometry(leafShape, {
+    steps: 5,
+    depth: 0.10,
+    bevelEnabled: true,
+  })))
+
+  const [leafGeometry2, setLeafGeometry2 ] = useState((new THREE.ExtrudeGeometry(leafShape2, {
+    steps: 5,
+    depth: 0.10,
+    bevelEnabled: true,
+  })))
+
   console.log('leafDimensions', leafDimensions)
   console.log('leafChange', leafChange)
   
-  const leafRef1 = useRef();
-  const leafRef2 = useRef();
 
   useFrame(() => {
     // leafRef1.current.rotation.y += 0.01;
@@ -34,10 +42,17 @@ function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 
   useEffect(() => {
     setLeafShape(new THREE.Shape())
     setLeafShape2(new THREE.Shape())
-  }, [])
+    setLeafChange(prev => !prev)
+  },[leafDimensions])
 
   useEffect(() => {
     if(leafShape) {
+      console.log('in here')
+      leafShape.moveTo(0, 0);
+      leafShape2.moveTo(0, 0);
+      leafShape.quadraticCurveTo(leafDimensions.d1,leafDimensions.d2,leafDimensions.d3,leafDimensions.d4)
+      leafShape2.quadraticCurveTo(-leafDimensions.d1,leafDimensions.d2,leafDimensions.d3,leafDimensions.d4)
+
       setLeafGeometry((new THREE.ExtrudeGeometry(leafShape, {
         steps: 5,
         depth: 0.10,
@@ -50,7 +65,7 @@ function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 
         bevelEnabled: true,
       })))
     }
-}, [leafShape])
+}, [leafChange])
  
 
   // console.log(cpX, cpY, rX, rY)
@@ -69,15 +84,7 @@ function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 
   //   requestAnimationFrame(updateMesh);
   // }
 
-  useEffect(() => {
-    if(leafShape) {
-      leafShape.moveTo(0, 0);
-      leafShape2.moveTo(0, 0);
-      leafShape.quadraticCurveTo(leafDimensions.d1,leafDimensions.d2,leafDimensions.d3,leafDimensions.d4)
-      leafShape2.quadraticCurveTo(-leafDimensions.d1,leafDimensions.d2,leafDimensions.d3,leafDimensions.d4)
-      setLeafChange(prev => !prev)
-    }
-  }, [leafDimensions])
+ 
  
 
   // leafShape.quadraticCurveTo(-1,-9,9,7)
@@ -106,6 +113,8 @@ function ProcLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 
   // const offsetY = 0;
   // const offsetZ = -1.5;
 
+  const leafRef1 = useRef();
+  const leafRef2 = useRef();
 
 
 

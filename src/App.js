@@ -7,6 +7,8 @@ import { TextureLoader } from 'three';
 import ThreeFlower from './ThreeFlower';
 import TorusStem from './TorusStem';
 import ProcLeaf2 from './ProcLeaf2';
+import ABLeaf from './ABLeaf';
+import ProcLeaf from './ProcLeaf';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 import stemObjPath from './textures/Flower.vox.obj';
@@ -52,119 +54,50 @@ function BloomModel({ position }) {
 }
 
 function App() {
-  // const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9})
-  const canvasRef = useRef()
-  const [colorMap, displacementMap, normalMap, roughnessMap, aoMap] = useLoader(TextureLoader, [
-    potCol,
-    potDisp,
-    potNorm,
-    potRough,
-    potOcc,
-  ]);
+  const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0})
+  // const canvasRef = useRef()
+  // const [colorMap, displacementMap, normalMap, roughnessMap, aoMap] = useLoader(TextureLoader, [
+  //   potCol,
+  //   potDisp,
+  //   potNorm,
+  //   potRough,
+  //   potOcc,
+  // ]);
 
-  const windowback = useLoader(TextureLoader, windowBackground);
+  function handleChange(event) {
+    setLeafDimensions(prev => {
+      console.log('prev', prev)
+        const updatedFormData = {
+            ...prev,
+            [event.target.id]: event.target.value
+        };
+        return updatedFormData
+    });
+}
 
-  const center = [0, 0, 0];
-  const offsetX = 1.4;
-  const offsetY = 0;
-  const offsetZ = -1.5;
-  const bloomModelPosition = [center[0] + offsetX, center[1] + offsetY, center[2] + offsetZ];
-  const flowerModelPosition = [center[0], center[1], center[2]];  
-
-  // function updateLeafDimensions(formData) {
-  //   setLeafDimensions(formData)
-  // }
-
+console.log('leafDimensions', leafDimensions)
 
   return (
     <>
-      {/* <Sliders updateLeafDimensions={updateLeafDimensions} /> */}
-
-    {/* <div style={{ height: '1080px', width: '98vw', background: 'aliceblue' }}>
+    <div style={{ height: '768px', width: '98vw', background: 'aliceblue' }}>
       <Canvas>
-        <ambientLight intensity={1} />
-        <directionalLight position={[10, 10, 10]} intensity={1} />
-        <spotLight position={[10, 10, 10]} angle={0.25} penumbra={1} />
-        <pointLight position={[10, 10, 10]} />
-        <BloomModel position={bloomModelPosition} />
-        <FlowerModel position={flowerModelPosition} />
-
-        <mesh position={center}>
-          <cylinderGeometry args={[1.02, .9, 1]} />
-          <meshStandardMaterial
-            color="white"
-            aoMap={aoMap}
-            normalMap={normalMap}
-            displacementScale={0}
-          />
-        </mesh>
-
-        <mesh position={[0, 4.6, 0]}>
-          <boxGeometry args={[10, 0.2, 2.2]} />
-          <meshStandardMaterial
-            color="tan"
-            aoMap={aoMap}
-            normalMap={normalMap}
-            displacementScale={0}
-          />
-        </mesh>
-
-        <mesh position={[0, -0.6, 0]}>
-          <boxGeometry args={[10, 0.2, 2.2]} />
-          <meshStandardMaterial
-            color="tan"
-            aoMap={aoMap}
-            normalMap={normalMap}
-            displacementScale={0}
-          />
-        </mesh>
-
-        <mesh position={[-4.5, 2, 0.98]}>
-          <boxGeometry args={[1, 5, 0.25]} />
-          <meshStandardMaterial
-            color="tan"
-            aoMap={aoMap}
-            normalMap={normalMap}
-            displacementScale={0}
-          />
-        </mesh>
-
-        <mesh position={[4.5, 2, 0.98]}>
-          <boxGeometry args={[1, 5, 0.25]} />
-          <meshStandardMaterial
-            color="tan"
-            aoMap={aoMap}
-            normalMap={normalMap}
-            displacementScale={0}
-          />
-        </mesh>
-
-
-        <mesh position={[0, 2, 0.98]}>
-          <boxGeometry args={[10, 5, 0.1]} />
-          <meshStandardMaterial map={windowback} />
-        </mesh>
-
-        <OrbitControls />
+        <ABLeaf leafDimensions={leafDimensions}></ABLeaf>
       </Canvas>
-    </div> */}
-    <div style={{ height: '968px', width: '98vw', background: 'aliceblue' }}>
-      <Canvas>
-        <ambientLight intensity={1} />
-        <directionalLight position={[10, 10, 10]} intensity={1} />
-        <spotLight position={[10, 10, 10]} angle={0.25} penumbra={1} />
-        <pointLight position={[10, 10, 10]} />
-        <OrbitControls />
-        <ProcLeaf2 />
-        {/* <ProcLeaf leafDimensions={leafDimensions}/> */}
-      </Canvas>
-      {/* <ThreeFlower />
-      <Suspense fallback={null}>
-      <GLTFModel url={scene1} />
-      </Suspense> */}
-        {/* <OrbitControls />
-      // </Canvas> */}
     </div>
+    <div className="slidecontainer">
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d1} className="slider" id="d1" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d2} className="slider" id="d2" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d3} className="slider" id="d3" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d4} className="slider" id="d4" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d5} className="slider" id="d5" />
+          <input onChange={event => handleChange(event)} type="range" min="0.00" max="1.00" value={leafDimensions.d6} className="slider" id="d6" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d7} className="slider" id="d7" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d8} className="slider" id="d8" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d9} className="slider" id="d9" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d10} className="slider" id="d10" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d11} className="slider" id="d11" />
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d12} className="slider" id="d12" />
+      </div>
     
     </>
   );
