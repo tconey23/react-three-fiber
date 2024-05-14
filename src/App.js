@@ -8,6 +8,7 @@ import ThreeFlower from './ThreeFlower';
 import TorusStem from './TorusStem';
 import ProcLeaf2 from './ProcLeaf2';
 import ABLeaf from './ABLeaf';
+import ABLeafShade from './ABLeafShade';
 import ProcLeaf from './ProcLeaf';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
@@ -81,7 +82,7 @@ console.log('leafDimensions', leafDimensions)
     <>
     <div style={{ height: '768px', width: '98vw', background: 'aliceblue' }}>
       <Canvas>
-        <ABLeaf leafDimensions={leafDimensions}></ABLeaf>
+        <ABLeafShade leafDimensions={leafDimensions}></ABLeafShade>
       </Canvas>
     </div>
     <div className="slidecontainer">
