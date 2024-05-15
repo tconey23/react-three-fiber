@@ -3,10 +3,12 @@ import { useFrame } from '@react-three/fiber';
 import { Sphere, Cylinder } from '@react-three/drei';
 import { Noise } from 'noisejs';
 import { TubeGeometry, CatmullRomCurve3, Vector3 } from 'three';
-import Leaf from './Leaf';
+import FlowerRender from './FlowerRender';
 
 
 const FlowerDaddy = (props) => {
+console.log('props in FD', props)
+
 
 const [flowerPedals, setFlowerPedals] = useState([]);
 const colorArray = ['red', 'blue', 'green', 'purple'];
@@ -14,12 +16,15 @@ const bloomRef = useRef();
 const tubeRef = useRef();
 const {flower, position, rotation, currentStage} = props
 
+
 const pathPoints = [
     [0.5, 0, 0], 
     [0.5, 0, 0],
     [0.5, 0, 0.8],
-    [0.1, flower.stemHeight.lifecycle[currentStage], 0]  
+    [0.1, parseInt(flower.phases[currentStage].stemHeight), 0]  
+    // [0.1, 10, 0]  
   ]
+  
 
 
   const tubularSegments = 100;
@@ -38,15 +43,15 @@ const pathPoints = [
     const pedalArray = [];
     let c = 0;
 
-    for (let i = 0; i < 1; i += 0.01) {
+    for (let i = 0; i < 1; i += 1) {
       pedalArray.push(
-        <Leaf
+        <FlowerRender
           key={i}
           positionX={0}
           positionY={0}
           positionZ={0}
           rotationX={0}
-          rotationY={i+100}
+          rotationY={i+1}
           rotationZ={0}
           color={colorArray[c]}
           flower={flower}
@@ -62,8 +67,9 @@ const pathPoints = [
     return (
         <mesh position={position}>
         <group>
-          <group ref={bloomRef} rotation={[flower.bloomRotationX.lifecycle[currentStage], flower.bloomRotationY.lifecycle[currentStage], flower.bloomRotationZ.lifecycle[currentStage]]} position={[0, flower.stemHeight.lifecycle[currentStage], 0]}>
-            <Sphere position={[0, 0, 0.1]} args={[flower.recRadius]}>
+          <group ref={bloomRef} rotation={[flower.phases[currentStage].bloomRotationX, flower.phases[currentStage].bloomRotationY, flower.phases[currentStage].bloomRotationZ]} position={[0, flower.phases[currentStage].stemHeight, 0]}>
+          {/* <group ref={bloomRef} rotation={[flower.bloomRotationX.lifecycle[currentStage], flower.bloomRotationY.lifecycle[currentStage], flower.bloomRotationZ.lifecycle[currentStage]]} position={[0, flower.stemHeight.lifecycle[currentStage], 0]}> */}
+            <Sphere position={[0, 0, 0.1]} args={[flower.phases[currentStage].recRadius]}>
               <meshStandardMaterial color="yellow" />
             </Sphere>
             {/* <Cylinder position={[0, -0.5, 0.05]} args={[0.25,0.14,1]}>
@@ -71,7 +77,7 @@ const pathPoints = [
             </Cylinder> */}
             {flowerPedals}
           </group>
-          <mesh ref={tubeRef} geometry={geometry} position={[0, 0, 0]}>
+          <mesh ref={tubeRef} geometry={geometry} position={[0, 0, 0]} rotation={rotation}>
             <meshStandardMaterial color="green" />
           </mesh>
         </group>

@@ -20,6 +20,7 @@
     "three": "^0.164.1",
     "three-csg": "^1.0.0",
     "three-skybox": "^0.0.2",
+    "threebox-plugin": "^2.2.7",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -12,26 +12,30 @@ import FlowerDaddy from './FlowerDaddy';
 
 const FlowerDataTest = () => {
     const lifeStages = []
-    const [currentStage, setCurrentStage] = useState(0)
-    const [flowerData, setFlowerData] = useState(flowers)
+    const [currentStage, setCurrentStage] = useState('thriving')
+    // const [currentStage, setCurrentStage] = useState('0')
+    // const [flowerData, setFlowerData] = useState(flowers)
+    const [renderFlowers, setRenderFlowers] = useState(null)
 
     useEffect(() => {
-     
+        const preppedFlowers = flowers.map((flower, index) => {
+            return (
+                <FlowerDaddy 
+                    flower={flower}
+                    currentStage={currentStage}
+                    key={flower.id}
+                    position={[0,0,index + 5]}
+                    rotation={[1,0,0]}
+                ></FlowerDaddy>
+            )
+        })
+
+        setRenderFlowers(preppedFlowers)
         
     }, [])
 
 
-    const renderFlowers = flowerData.map((flower, index) => {
-            return (
-                <FlowerDaddy 
-                    flower={flower.phases}
-                    currentStage={currentStage}
-                    key={flower.id}
-                    position={[0,index,0]}
-                    rotation={[0,0,0]}
-                ></FlowerDaddy>
-            )
-        })
+    
 
     // console.log(renderFlowers)
 
