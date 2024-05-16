@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Cylinder, OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Cylinder, OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
+import { Sky } from '@react-three/drei';
 import * as THREE from 'three';
 import { Noise } from 'noisejs';
+import FlowerAssembly from './TCComp/FlowerAssembly';
 
 const PlantBuilder = () => {
     const [shapesArray, setShapesArray] = useState([]);
     const [displayedShapes, setDisplayedShapes] = useState([]);
-    const [editShape, setEditShape] = useState()
-    const [shapeParams, setShapeParams] = useState(null)
+    const [editShape, setEditShape] = useState(null);
+    const [shapeParams, setShapeParams] = useState(null);
 
     useEffect(() => {
         const savedShapes = localStorage.getItem('shapeSettings');
@@ -30,10 +32,10 @@ const PlantBuilder = () => {
     const NoisyCylinder = ({ shape }) => {
         const meshRef = useRef();
         const noise = new Noise(shape.seed);
-    
+
         useEffect(() => {
             if (!meshRef.current) return;
-    
+
             const geometry = new THREE.CylinderGeometry(
                 shape.radiusTop,
                 shape.radiusBottom,
@@ -49,7 +51,7 @@ const PlantBuilder = () => {
             }
             geometry.attributes.position.needsUpdate = true;
             geometry.computeVertexNormals();
-    
+
             // Store custom parameters in userData
             meshRef.current.userData.noiseParams = {
                 noiseScale: shape.noiseScale,
@@ -57,11 +59,11 @@ const PlantBuilder = () => {
                 noiseImpactY: shape.noiseImpactY,
                 noiseImpactZ: shape.noiseImpactZ
             };
-    
-            meshRef.current.geometry.dispose();  
-            meshRef.current.geometry = geometry; 
+
+            meshRef.current.geometry.dispose();
+            meshRef.current.geometry = geometry;
         }, [shape]);
-    
+
         return (
             <Cylinder
                 onClick={handleClick}
@@ -78,16 +80,9 @@ const PlantBuilder = () => {
             </Cylinder>
         );
     };
-    
 
-    
     const handleClick = (event) => {
-        console.log(event.object)
-        const noiseScale = event.object.noiseScale;
-        const noiseImpactX = event.object.noiseImpactX;
-        const noiseImpactY = event.object.noiseImpactY;
-        const noiseImpactZ = event.object.noiseImpactZ;
-        const noiseData = event.object.userData.noiseParams; 
+        const noiseData = event.object.userData.noiseParams;
         if (noiseData) {
             console.log(noiseData.noiseScale);
             console.log(noiseData.noiseImpactX);
@@ -104,7 +99,6 @@ const PlantBuilder = () => {
             NoiseImpactY: noiseData.noiseImpactY,
             NoiseImpactZ: noiseData.noiseImpactZ,
         });
-
     };
 
     useEffect(() => {
@@ -127,16 +121,19 @@ const PlantBuilder = () => {
                     ))}
                 </select>
             </div>
-                <div id='shapeParams' style={{background: 'white'}}>
-                    {shapeParams && shapeParams}
-                </div>
+            <div id='shapeParams' style={{ background: 'white' }}>
+                {shapeParams && shapeParams}
+            </div>
             <Canvas>
                 <ambientLight intensity={1} />
                 <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
-                {displayedShapes.map((shape, index) => (
-                    <NoisyCylinder key={index} shape={shape}/>                  
-                ))}
+                <PerspectiveCamera makeDefault position={[10, 15, 0]} fov={75} near={0.1} far={1000} />
                 <OrbitControls />
+                <Sky />
+                <FlowerAssembly />
+                {displayedShapes.map((shape, index) => (
+                    <NoisyCylinder key={index} shape={shape} />
+                ))}
             </Canvas>
         </div>
     );

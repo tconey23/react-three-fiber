@@ -47,7 +47,7 @@ const pathPoints = [
       pedalArray.push(
         <FlowerRender
           key={i}
-          positionX={0}
+          positionX={0.2}
           positionY={0}
           positionZ={0}
           rotationX={0}
@@ -69,15 +69,12 @@ const pathPoints = [
         <group>
           <group ref={bloomRef} rotation={[flower.phases[currentStage].bloomRotationX, flower.phases[currentStage].bloomRotationY, flower.phases[currentStage].bloomRotationZ]} position={[0, flower.phases[currentStage].stemHeight, 0]}>
           {/* <group ref={bloomRef} rotation={[flower.bloomRotationX.lifecycle[currentStage], flower.bloomRotationY.lifecycle[currentStage], flower.bloomRotationZ.lifecycle[currentStage]]} position={[0, flower.stemHeight.lifecycle[currentStage], 0]}> */}
-            <Sphere position={[0, 0, 0.1]} args={[flower.phases[currentStage].recRadius]}>
+            <Sphere position={[0, 0, 0.2]} args={[flower.phases[currentStage].recRadius]}>
               <meshStandardMaterial color="yellow" />
             </Sphere>
-            {/* <Cylinder position={[0, -0.5, 0.05]} args={[0.25,0.14,1]}>
-              <meshStandardMaterial color="green" />
-            </Cylinder> */}
             {flowerPedals}
           </group>
-          <mesh ref={tubeRef} geometry={geometry} position={[0, 0, 0]} rotation={rotation}>
+          <mesh ref={tubeRef} geometry={geometry} position={[0, 0.5, -1.5]} rotation={rotation}>
             <meshStandardMaterial color="green" />
           </mesh>
         </group>

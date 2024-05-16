@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { createNoise3D } from 'simplex-noise';
-import { OrbitControls, Cylinder, Tube, Sphere, Stars } from '@react-three/drei';
+import { OrbitControls, Cylinder, Tube, Sphere, Stars, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import PlantBuilder from './PlantBuilder';
 import { Routes, Route, Link } from 'react-router-dom';
@@ -24,8 +24,8 @@ const FlowerDataTest = () => {
                     flower={flower}
                     currentStage={currentStage}
                     key={flower.id}
-                    position={[0,0,index + 5]}
-                    rotation={[1,0,0]}
+                    position={[0,0,index * 3]}
+                    rotation={[-6,0,0]}
                 ></FlowerDaddy>
             )
         })
@@ -44,6 +44,14 @@ const FlowerDataTest = () => {
             <Canvas style={{ width: '100vw', height: '95vh', backgroundColor: 'black' }}>
                 <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
                 <ambientLight intensity={1} />
+                <PerspectiveCamera
+        makeDefault
+        position={[14, 1, 1]}
+        fov={75}
+        aspect={window.innerWidth / window.innerHeight}
+        near={0.3}
+        far={1000}
+      />
                 <Stars />
                 {renderFlowers && renderFlowers}
                 <OrbitControls />

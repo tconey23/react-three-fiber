@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { Sky } from '@react-three/drei';
 import ThreeFlower from './ThreeFlower';
-import threeSkybox from 'three-skybox';
+import GardenBox from './TCComp/GardenBox';
 import { lifecycleParams } from './assets/flowerParams';
 import './App.css';
 
@@ -126,9 +127,9 @@ const Sandbox = () => {
   return (
     <>
       <div id="formContainer">
-        <label>Adjust All:</label>
-        <input type="range" min={-range} max={range} step={0.01} value={rangeValue} onChange={handleRange} />
-        <form>
+        {/* <label>Adjust All:</label>
+        <input type="range" min={-range} max={range} step={0.01} value={rangeValue} onChange={handleRange} /> */}
+        {/* <form>
           <label>RadiusTop</label>
           <input type="number" min={-100} max={100} value={geoParams.radiusTop} step={0.01} onChange={handleChange} onFocus={handleFocus} id="radiusTop" />
           <label>RadiusBottom</label>
@@ -167,12 +168,14 @@ const Sandbox = () => {
           <button type="button" onClick={() => handleLoadStage('thriving')}>Load Thriving</button>
           <button type="button" onClick={() => handleLoadStage('wilting')}>Load Wilting</button>
           <button type="button" onClick={() => handleLoadStage('dead')}>Load Dead</button>
-        </form>
+        </form> */}
       </div>
-      <Canvas style={{ width: '100vw', height: '95vh', backgroundColor: 'black' }}>
+      <Canvas style={{ width: '100vw', height: '300px', backgroundColor: 'black' }}>
         <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
-        <ambientLight intensity={1} />
+        <ambientLight intensity={0.5} />
+        <Sky />
         {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[1, 0, 0]} rotation={[0, 0, 0]} />}
+        <GardenBox />
         <OrbitControls />
       </Canvas>
     </>
