@@ -3,8 +3,6 @@ import Stem from "./Stem"
 import plant from "../assets/flowerData"
 import { useState, useEffect } from "react"
 
-
-
 const FlowerAssembly = () => {
 
     const convertPlantObj = (plant) => {
@@ -55,6 +53,7 @@ const FlowerAssembly = () => {
     const [currentTime, setCurrentTime] = useState(null)
       
     const [topPoint, setTopPoint] = useState(null)
+    const [bloomAngle, setBloomAngle] = useState(null)
     const [thisFlower, setThisFlower] = useState(convertPlantObj(plant))
     const [lifeCycle, setLifeCycle] = useState(300000)
     const [stage, setStage] = useState('seedling')
@@ -64,17 +63,20 @@ const FlowerAssembly = () => {
 
     useEffect(() => {
         if(thisFlower){
-            setStage(stages[1])
+            setStage(stages[0])
         }
     },  [thisFlower])
+
+
     
-    const handleTopPoint = (point) => {
+    const handleTopPoint = (point, angle) => {
             setTopPoint(point)
+            setBloomAngle(angle)
         }
 
         return (
             <>
-                {thisFlower && <Receptacle topPoint={topPoint} flower={thisFlower.phases[stage]}/>}
+                {thisFlower && <Receptacle topPoint={topPoint} bloomAngle={bloomAngle} flower={thisFlower.phases[stage]}/>}
                 <Stem onTopPointComputed={handleTopPoint} flower={thisFlower.phases[stage]}/>
             </>
         )

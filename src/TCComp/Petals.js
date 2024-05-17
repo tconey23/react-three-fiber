@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { Noise } from 'noisejs'
 
-function Petals({ color, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, flower}) {
+function Petals({ color, positionX, positionY, positionZ, flower}) {
 const { noiseScale,
         noiseImpactX,
         noiseImpactY,
@@ -13,8 +13,6 @@ const { noiseScale,
         radialSegments,
         rotation
   } = flower
-
-  console.log(flower)
 
   const meshRef = useRef()
   const noise = new Noise(123456)

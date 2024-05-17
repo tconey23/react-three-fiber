@@ -170,7 +170,7 @@ const Sandbox = () => {
           <button type="button" onClick={() => handleLoadStage('dead')}>Load Dead</button>
         </form> */}
       </div>
-      <Canvas style={{ width: '100vw', height: '300px', backgroundColor: 'black' }}>
+      <Canvas style={{ width: '100vw', height: '100vh', backgroundColor: 'black' }}>
         <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
         <ambientLight intensity={0.5} />
         <Sky />
