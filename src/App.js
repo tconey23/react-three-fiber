@@ -8,6 +8,7 @@ import ThreeFlower from './ThreeFlower';
 import TorusStem from './TorusStem';
 import ProcLeaf2 from './ProcLeaf2';
 import ABLeaf from './ABLeaf';
+import StrangeAttractor from './StrangeAttractor';
 import ABLeafShade from './ABLeafShade';
 import ProcLeaf from './ProcLeaf';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
@@ -25,6 +26,7 @@ import windowBackground from './textures/window-background.jpg';
 import { useRef, useState } from 'react';
 import scene1 from './assets/flower.gltf'
 import Sliders from './Sliders'
+import './App.css'
 
 function GLTFModel() {
   const gltf = useLoader(GLTFLoader, scene1);
@@ -56,14 +58,16 @@ function BloomModel({ position }) {
 
 function App() {
   const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0})
-  // const canvasRef = useRef()
-  // const [colorMap, displacementMap, normalMap, roughnessMap, aoMap] = useLoader(TextureLoader, [
-  //   potCol,
-  //   potDisp,
-  //   potNorm,
-  //   potRough,
-  //   potOcc,
-  // ]);
+  const [numStored, setNumStored] = useState(1)
+  const [storedFlowers, setStoredFlowers] = useState([])
+
+
+function storeFlower() {
+  setStoredFlowers((prev) => {
+    return [...prev, {[`flower${numStored}`]: leafDimensions}]
+  })
+  setNumStored((prev) => prev += 1)
+}
 
   function handleChange(event) {
     setLeafDimensions(prev => {
@@ -76,31 +80,56 @@ function App() {
     });
 }
 
-console.log('leafDimensions', leafDimensions)
+console.log('storedFlowers', storedFlowers)
 
   return (
-    <>
-    <div style={{ height: '768px', width: '98vw', background: 'aliceblue' }}>
-      <Canvas>
-        <ABLeafShade leafDimensions={leafDimensions}></ABLeafShade>
-      </Canvas>
-    </div>
-    <div className="slidecontainer">
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d1} className="slider" id="d1" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d2} className="slider" id="d2" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d3} className="slider" id="d3" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d4} className="slider" id="d4" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d5} className="slider" id="d5" />
-          <input onChange={event => handleChange(event)} type="range" min="0.00" max="1.00" value={leafDimensions.d6} className="slider" id="d6" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d7} className="slider" id="d7" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d8} className="slider" id="d8" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d9} className="slider" id="d9" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d10} className="slider" id="d10" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d11} className="slider" id="d11" />
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d12} className="slider" id="d12" />
+    <main>
+      <div style={{ height: '768px', width: '98vw', background: 'aliceblue' }}>
+        <Canvas>
+          <ABLeaf leafDimensions={leafDimensions}></ABLeaf>
+          {/* <StrangeAttractor leafDimensions={leafDimensions}></StrangeAttractor> */}
+        </Canvas>
       </div>
-    
-    </>
+      <div className="slide-container">
+        <label htmlFor="d1">QuadCurve 1: {leafDimensions.d1}
+          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d1} className="slider" id="d1" />
+        </label>
+        <label htmlFor="d2">QuadCurve 2: {leafDimensions.d2}
+            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d2} className="slider" id="d2" />
+        </label>
+        <label htmlFor="d3">QuadCurve 3: {leafDimensions.d3}
+            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d3} className="slider" id="d3" />
+        </label>
+        <label htmlFor="d4">QuadCurve 4: {leafDimensions.d4}
+            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d4} className="slider" id="d4" />
+        </label>
+        <label htmlFor="d5">Noise Scale: {leafDimensions.d5}
+            <input onChange={event => handleChange(event)} type="range" step="0.1" min="-10" max="10" value={leafDimensions.d5} className="slider" id="d5" />
+        </label>
+        <label htmlFor="d6">Noise X: {leafDimensions.d6}
+            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d6} className="slider" id="d6" />
+        </label>
+        <label htmlFor="d7">Noise Y: {leafDimensions.d7}
+            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d7} className="slider" id="d7" />
+        </label>
+        <label htmlFor="d8">Noise Z: {leafDimensions.d8}
+            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d8} className="slider" id="d8" />
+        </label>
+        <label htmlFor="d9">
+            <input onChange={event => handleChange(event)} type="range" step="0.001" min="0" max="1" value={leafDimensions.d9} className="slider" id="d9" />
+        </label>
+        <label htmlFor="d10">
+            <input onChange={event => handleChange(event)} type="range" step="0.001" min="0" max="1" value={leafDimensions.d10} className="slider" id="d10" />
+        </label>
+        <label htmlFor="d11">
+            <input onChange={event => handleChange(event)} type="range" step="0.001" min="0" max="1" value={leafDimensions.d11} className="slider" id="d11" />
+        </label>
+        <label htmlFor="d12">Depth: {leafDimensions.d12}
+            <input onChange={event => handleChange(event)} type="range" step="0.05" min="0.01" max="5" value={leafDimensions.d12} className="slider" id="d12" />
+        </label>
+        <button onClick={storeFlower}>sTOREfLOWER</button>
+      </div>
+    </main>
   );
 }
 

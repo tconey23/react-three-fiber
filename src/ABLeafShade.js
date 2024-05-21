@@ -22,7 +22,7 @@ function ABLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 0.
                 rotation={[rotationX, rotationY, rotationZ]}
                 scale={scale}
                 args={[4, 4, .01, 32]}
-                material={leafShaderMaterial}
+                // material={leafShaderMaterial}
             >
             </Cylinder>
 

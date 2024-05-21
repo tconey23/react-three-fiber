@@ -33,7 +33,7 @@ function AppShade() {
     <>
     <div style={{ height: '768px', width: '98vw', background: 'aliceblue' }}>
       <Canvas>
-        <ABLeafShade leafDimensions={leafDimensions}></ABLeafShade>
+        <ABLeaf leafDimensions={leafDimensions}></ABLeaf>
       </Canvas>
     </div>
     </>
