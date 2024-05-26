@@ -57,7 +57,7 @@ function BloomModel({ position }) {
 }
 
 function App() {
-  const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0})
+  const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0, d13: 2})
   const [numStored, setNumStored] = useState(1)
   const [storedFlowers, setStoredFlowers] = useState([])
 
@@ -84,7 +84,7 @@ console.log('storedFlowers', storedFlowers)
 
   return (
     <main>
-      <div style={{ height: '768px', width: '98vw', background: 'aliceblue' }}>
+      <div style={{ height: '768px', width: '80vw', background: 'aliceblue' }}>
         <Canvas>
           <ABLeaf leafDimensions={leafDimensions}></ABLeaf>
           {/* <StrangeAttractor leafDimensions={leafDimensions}></StrangeAttractor> */}
@@ -92,19 +92,19 @@ console.log('storedFlowers', storedFlowers)
       </div>
       <div className="slide-container">
         <label htmlFor="d1">QuadCurve 1: {leafDimensions.d1}
-          <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d1} className="slider" id="d1" />
+          <input onChange={event => handleChange(event)} type="range" step=".1" min="-50" max="50" value={leafDimensions.d1} className="slider" id="d1" />
         </label>
         <label htmlFor="d2">QuadCurve 2: {leafDimensions.d2}
-            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d2} className="slider" id="d2" />
+            <input onChange={event => handleChange(event)} type="range" step=".1" min="-50" max="50" value={leafDimensions.d2} className="slider" id="d2" />
         </label>
         <label htmlFor="d3">QuadCurve 3: {leafDimensions.d3}
-            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d3} className="slider" id="d3" />
+            <input onChange={event => handleChange(event)} type="range" step=".1" min="-50" max="50" value={leafDimensions.d3} className="slider" id="d3" />
         </label>
         <label htmlFor="d4">QuadCurve 4: {leafDimensions.d4}
-            <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d4} className="slider" id="d4" />
+            <input onChange={event => handleChange(event)} type="range" step=".1" min="-50" max="50" value={leafDimensions.d4} className="slider" id="d4" />
         </label>
         <label htmlFor="d5">Noise Scale: {leafDimensions.d5}
-            <input onChange={event => handleChange(event)} type="range" step="0.1" min="-10" max="10" value={leafDimensions.d5} className="slider" id="d5" />
+            <input onChange={event => handleChange(event)} type="range" step="0.01" min="-10" max="10" value={leafDimensions.d5} className="slider" id="d5" />
         </label>
         <label htmlFor="d6">Noise X: {leafDimensions.d6}
             <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d6} className="slider" id="d6" />
@@ -115,17 +115,20 @@ console.log('storedFlowers', storedFlowers)
         <label htmlFor="d8">Noise Z: {leafDimensions.d8}
             <input onChange={event => handleChange(event)} type="range" min="-50" max="50" value={leafDimensions.d8} className="slider" id="d8" />
         </label>
-        <label htmlFor="d9">
+        <label htmlFor="d9">xRotInc: {leafDimensions.d9}
             <input onChange={event => handleChange(event)} type="range" step="0.001" min="0" max="1" value={leafDimensions.d9} className="slider" id="d9" />
         </label>
-        <label htmlFor="d10">
+        <label htmlFor="d10">yRotInc: {leafDimensions.d10}
             <input onChange={event => handleChange(event)} type="range" step="0.001" min="0" max="1" value={leafDimensions.d10} className="slider" id="d10" />
         </label>
-        <label htmlFor="d11">
+        <label htmlFor="d11">zRotInc: {leafDimensions.d11}
             <input onChange={event => handleChange(event)} type="range" step="0.001" min="0" max="1" value={leafDimensions.d11} className="slider" id="d11" />
         </label>
         <label htmlFor="d12">Depth: {leafDimensions.d12}
             <input onChange={event => handleChange(event)} type="range" step="0.05" min="0.01" max="5" value={leafDimensions.d12} className="slider" id="d12" />
+        </label>
+        <label htmlFor="d13">numLeaves: {leafDimensions.d13}
+            <input onChange={event => handleChange(event)} type="range" step="1" min="2" max="100" value={leafDimensions.d13} className="slider" id="d13" />
         </label>
         <button onClick={storeFlower}>sTOREfLOWER</button>
       </div>
