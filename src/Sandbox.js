@@ -171,10 +171,13 @@ const Sandbox = () => {
         </form> */}
       </div>
       <Canvas style={{ width: '100vw', height: '100vh', backgroundColor: 'black' }}>
-        <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
+        <directionalLight intensity={10} castShadow position={[20, 3, 20]} shadow-mapSize={[1024, 1024]} />
         <ambientLight intensity={0.5} />
         <Sky />
-        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[1, 0, 0]} rotation={[0, 0, 0]} />}
+        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[0, 0, 0]} rotation={[0, 0, 0]} />}
+        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[5, 0, 10]} rotation={[0, 0, 0]} />}
+        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[0, 0, -5]} rotation={[0, 0, 0]} />}
+        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[-5, 0, 5]} rotation={[0, 0, 0]} />}
         <GardenBox />
         <OrbitControls />
       </Canvas>
