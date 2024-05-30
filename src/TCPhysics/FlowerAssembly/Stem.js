@@ -4,6 +4,10 @@ import { TubeGeometry, CatmullRomCurve3, Vector3 } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useSphere, useCylinder, useBox, usePointToPointConstraint, useLockConstraint, useDistanceConstraint, useSpring, useConeTwistConstraint } from '@react-three/cannon';
 import { Noise } from 'noisejs';
+import { Quaternion } from 'three';
+import { useGLTF } from '@react-three/drei';
+import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { Physics } from '@react-three/cannon';
 
 const lerp = (start, end, t) => start + (end - start) * t;
 
@@ -21,6 +25,8 @@ const Stem = ({ stage, flower, nextStage, stageDurations }) => {
   const springStiffness = 100;
   const springDamping = 10;
 
+  const mound = useGLTF('/tree_stump_02_4k/tree_stump_02_4k.gltf')
+  const clonedScene = useMemo(() => clone(mound.scene), [mound.scene]);
 
   const GROUP1 = 1 << 0
   const GROUP2 = 1 << 1
@@ -39,72 +45,95 @@ const Stem = ({ stage, flower, nextStage, stageDurations }) => {
   const [petalRadius, setPetalRadius] = useState(0.4)
   const [petalHeight, setPetalHeight] = useState(0.1)
 
-
-
   const noise = useMemo(() => new Noise(123456), []);
 
   const [recPoint, recPointApi] = useBox(() => ({
-    args: [1, 0.5, 0.5],
-    type: 'Static',
-    position: topPoint,
+    args: [0.1, 0.1, 0.1],
+    type: 'Dynamic',
     mass: 0,
+    collisionFilterGroup: GROUP1,
+    collisionFilterMask: GROUP2,
   }), [topPoint])
 
   const [stemColl1, stemCollApi1] = useSphere(() => ({
     args: [0.15, 32,64],
+    rotation: [Math.PI / 2,0,Math.PI / 1],
     type: 'Dynamic',
-    mass: 0,
-  }));
+    mass: 2,
+    collisionFilterGroup: GROUP1,
+    collisionFilterMask: GROUP2,
+  }), [topPoint]);
+
+  const [stemColl2, stemCollApi2] = useCylinder(() => ({
+    args: [0.2,0.2,0.2],
+    type: 'Kinematic',
+    mass: 1,
+    collisionFilterGroup: GROUP2,
+    collisionFilterMask: GROUP1,
+  }), [topPoint]);
+
+  const [stemColl3, stemCollApi3] = useSphere(() => ({
+    args: [0.2,0.2,0.2],
+    type: 'Kinematic',
+    mass: 1,
+    collisionFilterGroup: GROUP2,
+    collisionFilterMask: GROUP1,
+  }), [topPoint]);
+
+  const [stemColl4, stemCollApi4] = useCylinder(() => ({
+    args: [0.2,0.2,0.2],
+    type: 'Kinematic',
+    mass: 1,
+    collisionFilterGroup: GROUP2,
+    collisionFilterMask: GROUP1,
+  }), [topPoint]);
+
+  const [stemColl5, stemCollApi5] = useCylinder(() => ({
+    args: [0.2,0.2,0.2],
+    type: 'Kinematic',
+    mass: 1,
+    collisionFilterGroup: GROUP2,
+    collisionFilterMask: GROUP1,
+  }), [topPoint]);
+
+  const [stemColl6, stemCollApi6] = useCylinder(() => ({
+    args: [0.2,0.2,0.2],
+    type: 'Kinematic',
+    mass: 1,
+    collisionFilterGroup: GROUP2,
+    collisionFilterMask: GROUP1,
+  }), [topPoint]);
 
   const [petals, petalApi] = useCylinder(() => ({
-    args: [petalRadius, petalRadius, petalHeight * 2.5, 100],
-    mass: 0,
-    position: topPoint,
+    args: [1.5, 1.5, 0.10, 100],
+    rotation: [Math.PI / 2,Math.PI / 2,Math.PI / 2],
+    mass: 2,
     type: 'Dynamic',
     material: {
       friction: 0.5,
-      restitution: 0.1, // Reduce restitution to prevent bouncing
+      restitution: 1,
     },
-    angularDamping: 0.8, // Add angular damping
-  }), [topPoint, petalRadius]);
+    collisionFilterGroup: GROUP1,
+    collisionFilterMask: GROUP2,
+    angularDamping: 0.8,
+  }), [petalRadius]);
 
-  useDistanceConstraint(petals, stemColl1, {
-    distance: -0.1, 
-    stiffness: 0,
-    damping: 100,
+
+  useLockConstraint(petals, stemColl1,{
+    pivotA: [0, 0, 0],  
+    pivotB: [0, 0, 0], 
+    axisA: [0, 1, 0],     
+    axisB: [0, 1, 0],     
   })
 
-  useDistanceConstraint(stemColl1, recPoint, {
-    distance: -0.1, 
-    stiffness: 0,
-    damping: 100,
-  }, [topPoint])
-
-  // useConeTwistConstraint(petals,stemColl1, {
-  //   pivotA: [0, 0, 0],
-  //   pivotB: [0, 0, 0],
-  //   axisA: [0, 1, 0],
-  //   axisB: [0, 1, 0],
-  //   angle: Math.PI / 4,
-  //   twistAngle: Math.PI / 2,
-  // })
-
-  // useLockConstraint( stemColl1, recPoint, {
-  //   pivotA: [0, 0, 0],
-  //   pivotB: [0, 0, 0],
-  //   axisA: [1, 0, 0],
-  //   axisB: [1, 0, 0],
-  // })
-
-  // useConeTwistConstraint(stemColl1,recPoint, {
-  //   pivotA: [0, 0, 0],
-  //   pivotB: [0, 0, 0],
-  //   axisA: [0, 1, 0],
-  //   axisB: [0, 1, 0],
-  //   angle: Math.PI / 4,
-  //   twistAngle: Math.PI / 2,
-  // })
-
+  useConeTwistConstraint(stemColl1, recPoint, {
+    pivotA: [0, 0, 0],
+    pivotB: [0, 0, 0],
+    axisA: [0, 1, 0],
+    axisB: [0, 1, 0],
+    angle: Math.PI / 6,
+    twistAngle: Math.PI / 10,
+  })
 
   useEffect(() => {
     if (nextStage) { 
@@ -149,33 +178,67 @@ const Stem = ({ stage, flower, nextStage, stageDurations }) => {
       const closed = false;
       const tubeGeometry = new TubeGeometry(pathCurve, tubularSegments, radius, radialSegments, closed);
 
-      if (stemCollApi1) {
-        let pathNum = 8;
-        stemCollApi1.position.set(
+      if (recPointApi) {
+        let pathNum = 8
+        recPointApi.position.set(
           pathCurve.points[pathNum].x,
           pathCurve.points[pathNum].y,
           pathCurve.points[pathNum].z
-        );
-      }
+        )
+      }  
       
+      if (stemCollApi2) {
+        let pathNum = 6
+        stemCollApi2.position.set(
+          pathCurve.points[pathNum].x,
+          pathCurve.points[pathNum].y,
+          pathCurve.points[pathNum].z
+        )
 
-      // if (stemCollApi2) {
-      //   let pathNum = 7;
-      //   stemCollApi2.position.set(
-      //     pathCurve.points[pathNum].x,
-      //     pathCurve.points[pathNum].y,
-      //     pathCurve.points[pathNum].z
-      //   );
-      // }
+       const paths = pathCurve.points
+        const secondToLastVertex = new Vector3(...paths[paths.length - 2]);
+        const lastVertex = new Vector3(...paths[paths.length - 1]);
+        const direction = new Vector3().subVectors(lastVertex, secondToLastVertex).normalize();
+        const forward = new Vector3(0, 0, 1);
+        const quat = new Quaternion().setFromUnitVectors(forward, direction);
+        stemCollApi2.quaternion.set(...quat)
+      } 
 
-      // if (stemCollApi3) {
-      //   let pathNum = 6;
-      //   stemCollApi3.position.set(
-      //     pathCurve.points[pathNum].x,
-      //     pathCurve.points[pathNum].y,
-      //     pathCurve.points[pathNum].z
-      //   );
-      // }
+      if(stemCollApi3){
+        let pathNum = 7
+        stemCollApi3.position.set(
+          pathCurve.points[pathNum].x,
+          pathCurve.points[pathNum].y,
+          pathCurve.points[pathNum].z
+        )
+      }
+
+      if(stemCollApi4){
+        let pathNum = 5
+        stemCollApi4.position.set(
+          pathCurve.points[pathNum].x,
+          pathCurve.points[pathNum].y,
+          pathCurve.points[pathNum].z
+        )
+      }
+
+      if(stemCollApi5){
+        let pathNum = 4
+        stemCollApi5.position.set(
+          pathCurve.points[pathNum].x,
+          pathCurve.points[pathNum].y,
+          pathCurve.points[pathNum].z
+        )
+      }
+
+      if(stemCollApi6){
+        let pathNum = 3
+        stemCollApi6.position.set(
+          pathCurve.points[pathNum].x,
+          pathCurve.points[pathNum].y,
+          pathCurve.points[pathNum].z
+        )
+      }
 
       let rotation = pathCurve.points[6].normalize()
 
@@ -189,7 +252,7 @@ const Stem = ({ stage, flower, nextStage, stageDurations }) => {
       if (tubeRef.current) {
         tubeRef.current.geometry.dispose();
         tubeRef.current.geometry = tubeGeometry;
-      }
+      }     
 
       const interpolatedFlower = {
         ...currentFlower,
@@ -279,6 +342,7 @@ const Stem = ({ stage, flower, nextStage, stageDurations }) => {
     if(stemColl1){
       stemColl1.current.geometry = receptacleGeometry
     }
+    petalApi.wakeUp()
     
     petalApi.angularVelocity.set(0, 0, 0);
     setPetalRadius(petals.current.geometry.parameters.radiusTop)
@@ -286,17 +350,20 @@ const Stem = ({ stage, flower, nextStage, stageDurations }) => {
   }, [flower, noise]);
 
   return (
-    <group>
-      <mesh ref={tubeRef} rotation={[0, 0, 0]}>
+    <>
+    <group rotation={[0, Math.PI /2, 0]}>
+      <mesh castShadow ref={tubeRef} rotation={[0, 0, 0]}>
         <meshLambertMaterial color={'green'} />
       </mesh>
-      <mesh visible={false} ref={petals}>
+      <mesh castShadow visible={true} group={GROUP1} mask={GROUP2} ref={petals}>
         <meshLambertMaterial color={'blue'} />
       </mesh>
-      <mesh visible={false} ref={stemColl1}>
+      <mesh castShadow visible={true} group={GROUP1} mask={GROUP2} ref={stemColl1}>
           <meshLambertMaterial color={'yellow'}/>
       </mesh>
+      <primitive receiveShadow castShadow object={clonedScene} position={[0, 0, 0]} scale={[3, 2, 4]} />
     </group>
+    </>
   );
 };
 

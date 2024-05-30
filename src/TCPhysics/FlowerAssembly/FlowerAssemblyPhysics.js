@@ -6,8 +6,7 @@ import Stem from "./Stem";
 import { BoxGeometry } from 'three';
 import { Physics } from '@react-three/cannon';
 import { Debug } from '@react-three/cannon';
-import { useCylinder, useSpring, useBox, usePointToPointConstraint } from '@react-three/cannon';
-import Petals from './Petals';
+
 
 
 extend({ BoxGeometry }); 
@@ -15,7 +14,7 @@ extend({ BoxGeometry });
 
 export default function FlowerAssembly({ flower, seedling }) {
 
-    const lifeMin = 0.5
+    const lifeMin = 5
     const lifeSec = lifeMin * 60000
 
     const [planted, setPlanted] = useState(Date.now());
@@ -89,7 +88,7 @@ export default function FlowerAssembly({ flower, seedling }) {
         <StyledFlowerAssemblyPhysics className='styled-flower-assembly'>
             {seedling && <p className="flower-assembly">here's a sEEDbABY:</p>}
             <Canvas className={seedling ? "seedling" : "flower"} id='flowerCanvas'>
-                <Physics gravity={[0,-0.1,0]}>
+                <Physics gravity={[0, -8,0]}>
                     <Debug>
                 <ambientLight intensity={1} />
                 <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />

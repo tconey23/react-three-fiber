@@ -27,10 +27,9 @@ function App() {
       <Link to={'/FlowerDataTest'}> | Flower Data Test | </Link>
       <Link to={'/Physics'}> | Physics | </Link>
       <Link to={'/Collisions'}> | Collision | </Link>
-      <Link to={'/ConvexHull'}> | ConvexHull | </Link>
     </nav>
     <Routes>
-      <Route path={'/'} element={<Sandbox />}/>
+      <Route path={'/'} element={<Home flowers={userFlowers}/>}/>
       <Route path={'/TCFlower2'} element={<TCFlower2 />}/>
       {/* <Route path={'/2DNoise'} element={<TwoDNoise />}/> */}
       <Route path={'/3DNoise'} element={<ThreeDNoise />}/>
@@ -38,7 +37,6 @@ function App() {
       <Route path={'/FlowerDataTest'} element={<FlowerDataTest />}/>
       <Route path={'/Physics'} element={<Home flowers={userFlowers}/>}/>
       <Route path={'/Collisions'} element={<CollisionTest />}/>
-      <Route path={'/ConvexHull'} element={<ConvexHull />}/>
     </Routes>
  
     </>

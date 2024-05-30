@@ -92,7 +92,7 @@ const GardenBox = () => {
           />
         </Box>
 
-        <primitive object={gltf.scene} position={[10,1,1]} scale={[3, 2, 4]} />
+        {/* <primitive object={gltf.scene} position={[10,1,1]} scale={[3, 2, 4]} /> */}
         <primitive object={secondTree.scene} position={[20,-2,-30]} scale={[15,15,15]} />
         <primitive object={fence.scene} position={[40,-2,-0]} rotation={[0, Math.PI /2, 0]} scale={[0.25,0.25,0.25]} />
         {/* <primitive object={grass.scene} position={[10,1,1]} scale={[30, 30, 30]} /> */}
