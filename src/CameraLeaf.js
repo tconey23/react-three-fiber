@@ -178,7 +178,6 @@ positions.needsUpdate = true;
       <directionalLight position={[1, 1, 1]} intensity={1} />
       {/* <spotLight position={[10, 10, 10]} angle={0.25} penumbra={1} /> */}
       <pointLight position={[-10, -10, -10]} />
-      <OrbitControls />
       <group ref={groupRef}>
         {Array.from({ length: leafDimensions.d13 }, (_, index) => (
           <mesh
@@ -192,8 +191,8 @@ positions.needsUpdate = true;
             <meshStandardMaterial
               color={index%2 === 0 ? "orange" : "blue"}
                 roughness='0.9'
-                wireframe={true}
-                wireframeLinewidth={.5}
+                // wireframe={true}
+                // wireframeLinewidth={.5}
                 wireframeLinecap='butt'
               // opacity='.9'
               // transparent='true'

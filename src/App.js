@@ -8,6 +8,8 @@ import ThreeFlower from './ThreeFlower';
 import TorusStem from './TorusStem';
 import ProcLeaf2 from './ProcLeaf2';
 import ABLeaf from './ABLeaf';
+import CameraLeaf from './CameraLeaf';
+import Text from './Text';
 import StrangeAttractor from './StrangeAttractor';
 import ABLeafShade from './ABLeafShade';
 import ProcLeaf from './ProcLeaf';
@@ -27,6 +29,24 @@ import { useRef, useState } from 'react';
 import scene1 from './assets/flower.gltf'
 import Sliders from './Sliders'
 import './App.css'
+
+
+// const loader = new FontLoader();
+
+// loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+// 	const tGeometry = new TextGeometry( 'Hello three.js!', {
+// 		font: font,
+// 		size: 80,
+// 		depth: 5,
+// 		curveSegments: 12,
+// 		bevelEnabled: true,
+// 		bevelThickness: 10,
+// 		bevelSize: 8,
+// 		bevelOffset: 0,
+// 		bevelSegments: 5
+// 	} );
+// } );
 
 function GLTFModel() {
   const gltf = useLoader(GLTFLoader, scene1);
@@ -57,7 +77,7 @@ function BloomModel({ position }) {
 }
 
 function App() {
-  const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0, d13: 2})
+  const [leafDimensions, setLeafDimensions] = useState({d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0, d13: 2, d14: 0})
   const [numStored, setNumStored] = useState(1)
   const [storedFlowers, setStoredFlowers] = useState([])
 
@@ -85,8 +105,16 @@ console.log('storedFlowers', storedFlowers)
   return (
     <main>
       <div style={{ height: '768px', width: '80vw', background: 'aliceblue' }}>
-        <Canvas>
+        {/* <Canvas>
+          <OrbitControls />
+          <Text />
+        </Canvas> */}
+        <Canvas orthographic camera={{ zoom: 50, position: [0, 45, 100] }}>
           <ABLeaf leafDimensions={leafDimensions}></ABLeaf>
+          {/* <CameraLeaf leafDimensions={leafDimensions}></CameraLeaf>
+          <Text /> */}
+          {/* <planeBufferGeometry attach="geometry" args={[25, 15]} /> */}
+            {/* <meshPhongMaterial attach="material" color="green" /> */}
           {/* <StrangeAttractor leafDimensions={leafDimensions}></StrangeAttractor> */}
         </Canvas>
       </div>
@@ -128,8 +156,11 @@ console.log('storedFlowers', storedFlowers)
             <input onChange={event => handleChange(event)} type="range" step="0.05" min="0.01" max="5" value={leafDimensions.d12} className="slider" id="d12" />
         </label>
         <label htmlFor="d13">numLeaves: {leafDimensions.d13}
-            <input onChange={event => handleChange(event)} type="range" step="1" min="2" max="100" value={leafDimensions.d13} className="slider" id="d13" />
+            <input onChange={event => handleChange(event)} type="range" step="1" min="2" max="1000" value={leafDimensions.d13} className="slider" id="d13" />
         </label>
+        {/* <label htmlFor="d14">camera: {leafDimensions.d14}
+            <input onChange={event => handleChange(event)} type="range" step="1" min="2" max="1000" value={leafDimensions.d14} className="slider" id="d14" />
+        </label> */}
         <button onClick={storeFlower}>sTOREfLOWER</button>
       </div>
     </main>
