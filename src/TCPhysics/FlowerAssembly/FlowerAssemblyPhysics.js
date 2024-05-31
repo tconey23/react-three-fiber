@@ -90,7 +90,6 @@ export default function FlowerAssembly({ flower, seedling }) {
             <Canvas className={seedling ? "seedling" : "flower"} id='flowerCanvas'>
                 <Physics gravity={[0, -8,0]}>
                     <Debug>
-                <ambientLight intensity={1} />
                 <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
                 <OrthographicCamera makeDefault position={[100, 10, 10]} zoom={30} />
                 {seedling && <OrthographicCamera makeDefault position={[100, 1000, 0]} zoom={80} />}

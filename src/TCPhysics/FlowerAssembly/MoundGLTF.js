@@ -20,7 +20,6 @@ const GLTFModel = ({ position }) => {
 const MoundGLTF = () => {
   return (
     <group>
-      <ambientLight />
       <GLTFModel position={[0, 0, 0]} />
       <GLTFModel position={[2, 0, 0]} />
       <GLTFModel position={[-2, 0, 0]} />

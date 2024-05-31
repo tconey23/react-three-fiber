@@ -251,7 +251,6 @@ const TCFlower2 = () => {
         ))}
       </div>
       <Canvas style={{ width: '100vw', height: '95vh', backgroundColor: 'black' }}>
-        <ambientLight intensity={1} />
         <directionalLight intensity={10} castShadow position={[0, 0, -6]} shadow-mapSize={[1024, 1024]} />
         <directionalLight intensity={10} castShadow position={[2, 1, 5]} shadow-mapSize={[1024, 1024]} />
         {generateLatheLayers()}

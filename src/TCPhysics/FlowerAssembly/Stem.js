@@ -361,7 +361,7 @@ const Stem = ({ stage, flower, nextStage, stageDurations }) => {
       <mesh castShadow visible={true} group={GROUP1} mask={GROUP2} ref={stemColl1}>
           <meshLambertMaterial color={'yellow'}/>
       </mesh>
-      <primitive receiveShadow castShadow object={clonedScene} position={[0, 0, 0]} scale={[3, 2, 4]} />
+      {/* <primitive receiveShadow castShadow object={clonedScene} position={[0, 0, 0]} scale={[3, 2, 4]} /> */}
     </group>
     </>
   );

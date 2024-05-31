@@ -14,6 +14,7 @@ import Home from './TCPhysics/Home/Home'
 import CollisionTest from './TCPhysics/CollisionTests/CollisionTests';
 import userFlowers from './TCPhysics/userFlowers-dummy';
 import ConvexHull from './TCPhysics/ConvexHull/ConvexHull';
+import Loading from './Loading';
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
       <Link to={'/FlowerDataTest'}> | Flower Data Test | </Link>
       <Link to={'/Physics'}> | Physics | </Link>
       <Link to={'/Collisions'}> | Collision | </Link>
+      <Link to={'/Loading'}> |  Loading  | </Link>
     </nav>
     <Routes>
       <Route path={'/'} element={<Home flowers={userFlowers}/>}/>

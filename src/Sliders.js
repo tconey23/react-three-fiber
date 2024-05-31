@@ -105,7 +105,6 @@ function Sliders() {
         </div>
       </div>
       <Canvas>
-        <ambientLight intensity={1} />
         <directionalLight intensity={10} castShadow position={[0, 5, 0]} shadow-mapSize={[1024, 1024]}></directionalLight>
         <ProcLeaf extrudeSettings={extrudeSettings} heartShape={heartShape} />
         <OrbitControls />
