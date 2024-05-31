@@ -1,9 +1,8 @@
-import React, { Suspense } from 'react';
-import { Canvas, useLoader } from '@react-three/fiber';
-import { OrbitControls, Float, Center, Shadow, Plane, MeshWobbleMaterial, Circle } from '@react-three/drei';
+import React, { useRef, useState } from 'react';
+import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
+import { OrbitControls, Float, Plane } from '@react-three/drei';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
-import { PlaneGeometry, TextureLoader } from 'three';
 import ThreeFlower from './ThreeFlower';
 import TorusStem from './TorusStem';
 import ProcLeaf2 from './ProcLeaf2';
@@ -12,6 +11,7 @@ import CameraLeaf from './CameraLeaf';
 import CameraButton from './CameraButton';
 import Text from './Text';
 import Text2 from './Text2';
+import Text3 from './Text3';
 import StrangeAttractor from './StrangeAttractor';
 import ABLeafShade from './ABLeafShade';
 import ProcLeaf from './ProcLeaf';
@@ -27,10 +27,9 @@ import potNorm from './textures/Wall_Plaster_001_normal.jpg';
 import potOcc from './textures/Wall_Plaster_001_ambientOcclusion.jpg';
 import potRough from './textures/Wall_Plaster_001_roughness.jpg';
 import windowBackground from './textures/window-background.jpg';
-import { useRef, useState } from 'react';
-import scene1 from './assets/flower.gltf'
-import Sliders from './Sliders'
-import './App.css'
+import scene1 from './assets/flower.gltf';
+import Sliders from './Sliders';
+import './App.css';
 import Sky from './models/Sky';
 
 
@@ -79,11 +78,33 @@ function BloomModel({ position }) {
   return <primitive object={bloom} position={position} />;
 }
 
+
+function CameraAnimation() {
+  const { camera } = useThree();
+  const targetPosition = useRef([0, 20, 100]);
+  const targetZoom = useRef(80);
+  const progress = useRef(0);
+
+  useFrame(() => {
+    if (progress.current < 1) {
+      progress.current += 0.0001; // Adjust the speed of the animation
+      camera.position.lerp({ x: targetPosition.current[0], y: targetPosition.current[1], z: targetPosition.current[2] }, progress.current);
+      camera.zoom = camera.zoom + (targetZoom.current - camera.zoom) * 0.01;
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+    }
+  });
+
+  return null;
+}
+
+
 function App() {
   const [leafDimensions, setLeafDimensions] = useState({ d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0, d13: 2, d14: 0 })
   const [numStored, setNumStored] = useState(1)
   const [storedFlowers, setStoredFlowers] = useState([])
-
+  const [animate, setAnimate] = useState(false)
+  const cameraLeafRef = useRef();
 
   function storeFlower() {
     setStoredFlowers((prev) => {
@@ -103,26 +124,13 @@ function App() {
     });
   }
 
-
-
-  console.log('storedFlowers', storedFlowers)
-
-
-  const GLOW_VERTEX_SHADERS = `
-  varying vec3 vNormal;
-  void main() {
-      vec3 vNormal = normalize( normalMatrix * normal );
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  function handleAnimate() {
+    setAnimate('true')
   }
-  `
 
-const GLOW_FRAGMENT_SHADERS = `
-  varying vec3 vNormal;
-  void main() {
-      float intensity = pow( 0.7 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) ), 4.0 );
-      gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 ) * intensity;
-  }
-  `
+
+
+
 
 
   
@@ -136,6 +144,9 @@ const GLOW_FRAGMENT_SHADERS = `
 
         <Canvas style={{ background: 'skyblue' }} shadows orthographic camera={{ zoom: 60, position: [-90, 45, 100] }}>
           
+        {animate && <CameraAnimation targetRef={cameraLeafRef} />}
+
+
           {/* <OrbitControls /> */}
           {/* <Shadow
           color="black"
@@ -151,18 +162,27 @@ const GLOW_FRAGMENT_SHADERS = `
           
             {/* <axesHelper args={[25]} /> */}
             {/* <ABLeaf leafDimensions={leafDimensions}></ABLeaf> */}
-            <CameraLeaf leafDimensions={leafDimensions}></CameraLeaf>
-            <Float
+            <CameraLeaf ref={cameraLeafRef} leafDimensions={leafDimensions} position={[0, 0, 0]}></CameraLeaf>
+              <Float
               speed={10} // Animation speed, defaults to 1
               rotationIntensity={.04} // XYZ rotation intensity, defaults to 1
               floatIntensity={.06} // Up/down float intensity, defaults to 1
-            >
-              <mesh rotation={[0, ((-Math.PI / 2) - (-Math.PI / 2) * .02), 0]} position={[4, 4, 4]}>
-                <Text />
-              </mesh>
-              <mesh rotation={[0, ((-Math.PI / 2) * .02), 0]} position={[-4, 4, -4]}>
-                <Text2 />
-              </mesh>
+              >
+                {
+                  !animate ?
+                  <>
+                    <mesh rotation={[0, ((-Math.PI / 2) - (-Math.PI / 2) * .02), 0]} position={[4, 4, 4]}>
+                      <Text />
+                    </mesh>
+                    <mesh rotation={[0, ((-Math.PI / 2) * .02), 0]} position={[-4, 4, -4]}>
+                      <Text2 />
+                    </mesh>
+                  </>
+                  :
+                  <mesh rotation={[0, ((-Math.PI / 2) * .02), 0]} position={[0, 3, -4]}>
+                    <Text3 />
+                  </mesh>
+                }
             </Float>
             <mesh rotation={[(-Math.PI / 2), 0, 0]} position={[0, 0, 0]}>
               {/* <Circle receiveShadow args={[6.4, 128]}>
@@ -222,6 +242,7 @@ const GLOW_FRAGMENT_SHADERS = `
             <input onChange={event => handleChange(event)} type="range" step="1" min="2" max="1000" value={leafDimensions.d14} className="slider" id="d14" />
         </label> */}
         <button onClick={storeFlower}>sTOREfLOWER</button>
+        <button onClick={handleAnimate}>aNIMATEcAMERA</button>
       </div>
     </main>
   );
