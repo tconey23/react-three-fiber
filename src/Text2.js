@@ -155,35 +155,35 @@ export default function Text() {
     //     groupRef.current.rotation.y = -.6
     // } 
 
-  useFrame(() => {
+//   useFrame(() => {
     
 
-    textRefs.forEach((ref, index) => {
-      if (ref.current) {
-        const rotationSpeed = 0.01;
-        console.log(ref.current.rotation.y)
-        if((ref.current.rotation.y < Math.PI) && (ref.current.rotation.y > -Math.PI)) {
-            // groupRef.current.rotation.y += .0001
-            ref.current.rotation.y += (index % 2 === 0 ? 1 : -1) * rotationSpeed;
-            ref.current.rotation.x += (index % 3 === 0 ? 1 : -1) * rotationSpeed;
-            ref.current.rotation.z += (index % 4 === 0 ? 1 : -1) * rotationSpeed;
-        }
-      }
-    });
-  });
+//     textRefs.forEach((ref, index) => {
+//       if (ref.current) {
+//         const rotationSpeed = 0.01;
+//         console.log(ref.current.rotation.y)
+//         if((ref.current.rotation.y < Math.PI) && (ref.current.rotation.y > -Math.PI)) {
+//             // groupRef.current.rotation.y += .0001
+//             ref.current.rotation.y += (index % 2 === 0 ? 1 : -1) * rotationSpeed;
+//             ref.current.rotation.x += (index % 3 === 0 ? 1 : -1) * rotationSpeed;
+//             ref.current.rotation.z += (index % 4 === 0 ? 1 : -1) * rotationSpeed;
+//         }
+//       }
+//     });
+//   });
 
-  const textStrings = ['b', 'L', 'O', 'O', 'M', 'b', 'A', 'B', 'Y'];
+  const textStrings = ['hello! here are your flowers!', 'check out your garden', 'and watch them grow'];
 
   return (
     <group ref={groupRef}>
       {textStrings.map((text, index) => (
         <mesh castShadow receiveShadow
           key={index}
-          position={[-4 + index, 0, 0]}
+          position={[0, 1 - index, 0]}
           ref={textRefs[index]}
         >
-          <textGeometry args={[text, { font, size: 1, height: .73 }]} />
-          <meshStandardMaterial color='hotpink'/>
+          <textGeometry args={[text, { font, size: .5, height: .2 }]} />
+          <meshStandardMaterial color='yellow'/>
         </mesh>
       ))}
     </group>

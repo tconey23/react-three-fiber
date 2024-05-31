@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, MeshWobbleMaterial } from '@react-three/drei';
 import { Noise } from 'noisejs';
 
 function ABLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 0.25, 0.25], leafDimensions, ...props }) {
@@ -174,13 +174,9 @@ positions.needsUpdate = true;
 
   return (
     <>
-      <ambientLight intensity={.2} />
-      <directionalLight position={[1, 1, 1]} intensity={1} />
-      {/* <spotLight position={[10, 10, 10]} angle={0.25} penumbra={1} /> */}
-      <pointLight position={[-10, -10, -10]} />
       <group ref={groupRef}>
         {Array.from({ length: leafDimensions.d13 }, (_, index) => (
-          <mesh
+          <mesh castShadow receiveShadow
             key={index}
             ref={(ref) => (leafRefs.current[index] = ref)}
             {...props}
@@ -188,8 +184,8 @@ positions.needsUpdate = true;
             scale={scale}
           >
             <bufferGeometry attach="geometry" {...leafGeometry1} />
-            <meshStandardMaterial
-              color={index%2 === 0 ? "orange" : "blue"}
+            <MeshWobbleMaterial
+              color={index%2 === 0 ? "orange" : "yellow"}
                 roughness='0.9'
                 // wireframe={true}
                 // wireframeLinewidth={.5}
