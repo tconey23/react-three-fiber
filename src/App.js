@@ -33,52 +33,6 @@ import './App.css';
 import Sky from './models/Sky';
 
 
-// const loader = new FontLoader();
-
-// loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
-
-// 	const tGeometry = new TextGeometry( 'Hello three.js!', {
-// 		font: font,
-// 		size: 80,
-// 		depth: 5,
-// 		curveSegments: 12,
-// 		bevelEnabled: true,
-// 		bevelThickness: 10,
-// 		bevelSize: 8,
-// 		bevelOffset: 0,
-// 		bevelSegments: 5
-// 	} );
-// } );
-
-function GLTFModel() {
-  const gltf = useLoader(GLTFLoader, scene1);
-
-  return (
-    <group>
-      <primitive object={gltf.scene} scale={0.1} position={[0, 5, 0.5]} />
-    </group>
-  );
-}
-
-function FlowerModel({ position }) {
-  const materials = useLoader(MTLLoader, stemMtlPath);
-  materials.preload();
-  const obj = useLoader(OBJLoader, stemObjPath, (loader) => {
-    loader.setMaterials(materials);
-  });
-  return <primitive object={obj} position={position} />;
-}
-
-function BloomModel({ position }) {
-  const bloomMaterials = useLoader(MTLLoader, bloomMtlPath);
-  bloomMaterials.preload();
-  const bloom = useLoader(OBJLoader, bloomObjPath, (loader) => {
-    loader.setMaterials(bloomMaterials);
-  });
-  return <primitive object={bloom} position={position} />;
-}
-
-
 function CameraAnimation() {
   const { camera } = useThree();
   const targetPosition = useRef([0, 20, 100]);
@@ -100,7 +54,7 @@ function CameraAnimation() {
 
 
 function App() {
-  const [leafDimensions, setLeafDimensions] = useState({ d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0, d13: 2, d14: 0 })
+  const [leafDimensions, setLeafDimensions] = useState({ d1: 9, d2: 18, d3: 0, d4: 9, d5: 0, d6: 0, d7: 0, d8: 0, d9: 0, d10: 0, d11: 0, d12: 0, d13: 2, d14: .25, d15: .25, d16: .25 })
   const [numStored, setNumStored] = useState(1)
   const [storedFlowers, setStoredFlowers] = useState([])
   const [animate, setAnimate] = useState(false)
@@ -129,14 +83,9 @@ function App() {
   }
 
 
-
-
-
-
-  
   return (
     <main>
-      <div style={{ height: '100vh', width: '90vw', background: 'aliceblue' }}>
+      <div style={{ height: '100vh', width: '90vw' }}>
         {/* <Canvas>
           <OrbitControls />
           <Text />
@@ -192,7 +141,7 @@ function App() {
                 <meshPhongMaterial color="skyblue" />
               </Plane>
             </mesh>
-            {/* <Sky scale={.2} rotation={[-110, -150, 0]}/> */}
+            <Sky scale={.2} rotation={[-110, -150, 0]}/>
           </group>
           {/* <StrangeAttractor leafDimensions={leafDimensions}></StrangeAttractor> */}
         </Canvas>
@@ -237,6 +186,15 @@ function App() {
         </label>
         <label htmlFor="d13">numLeaves: {leafDimensions.d13}
           <input onChange={event => handleChange(event)} type="range" step="1" min="2" max="1000" value={leafDimensions.d13} className="slider" id="d13" />
+        </label>
+        <label htmlFor="d14">scaleX: {leafDimensions.d14}
+          <input onChange={event => handleChange(event)} type="range" step=".01" min="0" max="1" value={leafDimensions.d14} className="slider" id="d14" />
+        </label>
+        <label htmlFor="d15">scaleY: {leafDimensions.d15}
+          <input onChange={event => handleChange(event)} type="range" step=".01" min="0" max="1" value={leafDimensions.d15} className="slider" id="d15" />
+        </label>
+        <label htmlFor="d16">scaleZ: {leafDimensions.d16}
+          <input onChange={event => handleChange(event)} type="range" step=".01" min="0" max="1" value={leafDimensions.d16} className="slider" id="d16" />
         </label>
         {/* <label htmlFor="d14">camera: {leafDimensions.d14}
             <input onChange={event => handleChange(event)} type="range" step="1" min="2" max="1000" value={leafDimensions.d14} className="slider" id="d14" />

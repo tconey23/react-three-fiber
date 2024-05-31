@@ -41,28 +41,6 @@ export default function Text() {
     });
   }, [textRefs]);
 
-
-    // if(groupRef.current) {
-    //     groupRef.current.rotation.y = -.6
-    // } 
-
-//   useFrame(() => {
-    
-
-//     textRefs.forEach((ref, index) => {
-//       if (ref.current) {
-//         const rotationSpeed = 0.01;
-//         console.log(ref.current.rotation.y)
-//         if((ref.current.rotation.y < Math.PI) && (ref.current.rotation.y > -Math.PI)) {
-//             // groupRef.current.rotation.y += .0001
-//             ref.current.rotation.y += (index % 2 === 0 ? 1 : -1) * rotationSpeed;
-//             ref.current.rotation.x += (index % 3 === 0 ? 1 : -1) * rotationSpeed;
-//             ref.current.rotation.z += (index % 4 === 0 ? 1 : -1) * rotationSpeed;
-//         }
-//       }
-//     });
-//   });
-
   const textStrings = ['Select a flower for details!'];
 
   return (

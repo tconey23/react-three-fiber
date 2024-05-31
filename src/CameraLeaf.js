@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls, MeshWobbleMaterial } from '@react-three/drei';
 import { Noise } from 'noisejs';
 
-function ABLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [0.25, 0.25, 0.25], leafDimensions, ...props }) {
+function ABLeaf({ rotationX = 0, rotationY = 0, rotationZ = 0, scale = [.25, .25, .25], leafDimensions, ...props }) {
     const leafRefs = useRef([]);
     const groupRef = useRef(null);
 
@@ -181,11 +181,12 @@ positions.needsUpdate = true;
             ref={(ref) => (leafRefs.current[index] = ref)}
             {...props}
             rotation={[rotationX + index * xRotInc, rotationY + index * yRotInc, rotationZ + index * zRotInc]}
-            scale={scale}
+            scale={[leafDimensions.d14, leafDimensions.d15, leafDimensions.d16]}
           >
             <bufferGeometry attach="geometry" {...leafGeometry1} />
+            {/* <meshStandardMaterial */}
             <MeshWobbleMaterial
-              color={index%2 === 0 ? "orange" : "yellow"}
+              color={index%2 === 0 ? "red" : "yellow"}
                 roughness='0.9'
                 // wireframe={true}
                 // wireframeLinewidth={.5}
