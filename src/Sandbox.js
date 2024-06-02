@@ -6,6 +6,7 @@ import ThreeFlower from './ThreeFlower';
 import GardenBox from './TCComp/GardenBox';
 import { lifecycleParams } from './assets/flowerParams';
 import './App.css';
+import LatheFlower from './LatheFlower';
 
 const Sandbox = () => {
   const flower = useRef();
@@ -174,11 +175,7 @@ const Sandbox = () => {
         <directionalLight intensity={10} castShadow position={[20, 3, 20]} shadow-mapSize={[1024, 1024]} />
         <ambientLight intensity={0.5} />
         <Sky />
-        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[0, 0, 0]} rotation={[0, 0, 0]} />}
-        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[5, 0, 10]} rotation={[0, 0, 0]} />}
-        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[0, 0, -5]} rotation={[0, 0, 0]} />}
-        {geoParams && <ThreeFlower ref={flower} geoParams={geoParams} position={[-5, 0, 5]} rotation={[0, 0, 0]} />}
-        <GardenBox />
+          <LatheFlower />
         <OrbitControls />
       </Canvas>
     </>
